@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saman Healthcare | Login</title>
+    <!-- All visual styling is kept in this separate CSS file. -->
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <!-- The main container holds the welcome section and the form section. -->
+    <main class="auth-shell">
+        <!-- Left side: branding, introduction, and healthcare illustration. -->
+        <section class="welcome-panel" aria-label="Saman Healthcare">
+            <div class="brand"><span class="brand-mark" aria-hidden="true">+</span> <span class="brand-text">Saman
+                    Healthcare</span></div>
+            <div class="welcome-copy">
+                <h1>Care begins with a conversation.</h1>
+                <p>Connect with your care team, manage appointments, and keep your health journey in one place.</p>
+            </div>
+            <!-- This inline SVG draws the decorative healthcare illustration. -->
+            <svg class="medical-illustration" viewBox="0 0 520 330" role="img"
+                aria-label="Healthcare team illustration">
+                <circle cx="260" cy="160" r="140" fill="rgba(88,145,255,.28)" />
+                <path d="M119 285h275M151 80v160m78-160v160m78-160v160m-162-128h162m-162 55h162"
+                    stroke="rgba(116,181,255,.42)" stroke-width="8" />
+                <path d="M55 274c28-26 54-25 79 0" stroke="#56e1d0" stroke-width="6" fill="none" />
+                <path d="M72 274c-15-23-24-38-24-58 23 9 38 29 24 58Zm28 0c3-27 13-44 31-56 9 24-1 46-31 56Z"
+                    fill="#53e0d0" />
+                <path d="M61 278h45v20H61z" fill="#2234a7" />
+                <g transform="translate(156 78)">
+                    <circle cx="65" cy="32" r="28" fill="#d98676" />
+                    <path d="M38 36c-2-34 49-49 63-8-17-12-42-10-63 8Z" fill="#24225c" />
+                    <path d="M35 75c20-18 47-18 65 0l17 115H18Z" fill="#39dbc9" />
+                    <path d="M48 76l20 45 20-45M68 120v70" fill="none" stroke="#fff" stroke-width="5" />
+                    <path d="M45 190l-8 65m43-65 10 65" stroke="#37e0c6" stroke-width="17" />
+                    <path d="M31 258h28m25 0h29" stroke="#f6f8ff" stroke-width="10" stroke-linecap="round" />
+                    <path d="M101 104c19 15 27 35 31 55" stroke="#d98676" stroke-width="12" fill="none" />
+                    <rect x="116" y="142" width="35" height="30" rx="3" fill="#f7ffff" />
+                </g>
+                <g transform="translate(302 71)">
+                    <circle cx="64" cy="35" r="28" fill="#ad625f" />
+                    <path d="M38 37c-4-35 56-48 63-3-20-15-42-15-63 3Z" fill="#4a2857" />
+                    <path d="M25 78c24-21 55-21 80 0l-2 116H28Z" fill="#f5f7ff" />
+                    <path d="M65 78v116m-39-92h78" stroke="#b8c9ef" stroke-width="4" />
+                    <path d="M48 194l-10 61m43-61 12 61" stroke="#43d6c4" stroke-width="18" />
+                    <path d="M32 258h31m23 0h31" stroke="#f6f8ff" stroke-width="10" stroke-linecap="round" />
+                    <path d="M28 101c-13 16-18 35-20 56m93-56c12 17 17 36 20 56" stroke="#ad625f" stroke-width="12"
+                        fill="none" />
+                </g>
+            </svg>
+        </section>
+        <!-- Right side: the login and registration form. -->
+        <section class="form-panel">
+            <div class="auth-card" id="authCard">
+                <h2>Welcome back!</h2>
+                <form id="authForm">
+                    <!-- Choose which type of healthcare account is being accessed. -->
+                    <div class="role-switch" role="group" aria-label="Account type">
+                        <button class="active" id="patientRole" type="button" data-role="patient"
+                            aria-pressed="true">Patient</button>
+                        <button id="doctorRole" type="button" data-role="doctor" aria-pressed="false">Doctor</button>
+                    </div>
+                    <!-- These fields are hidden during login and shown during registration. -->
+                    <div class="register-fields">
+                        <div class="field"><label for="fullName">Full name</label><input id="fullName" type="text"
+                                placeholder="Your full name" autocomplete="name"></div>
+                        <div class="field"><label for="email">Email address</label><input id="email" type="email"
+                                placeholder="you@example.com" autocomplete="email"></div>
+                        <div class="registration-details patient-details">
+                            <div class="field"><label for="dateOfBirth">Date of birth</label><input id="dateOfBirth"
+                                    type="date" autocomplete="bday"></div>
+                            <div class="field"><label for="patientPhone">Phone number</label><input id="patientPhone"
+                                    type="tel" placeholder="Your phone number" autocomplete="tel"></div>
+                        </div>
+                        <div class="registration-details doctor-details">
+                            <div class="field"><label for="specialization">Specialization</label><input
+                                    id="specialization" type="text" placeholder="e.g. Cardiology"></div>
+                            <div class="field"><label for="licenseNumber">Medical license number</label><input
+                                    id="licenseNumber" type="text" placeholder="License number"></div>
+                        </div>
+                    </div>
+                    <div class="field"><label for="userId">Patient ID or email</label><input id="userId" type="text"
+                            placeholder="Enter your patient ID" autocomplete="username" required></div>
+                    <div class="field"><label for="password">Password</label><input id="password" type="password"
+                            placeholder="Enter your password" autocomplete="current-password" required></div>
+                    <div class="login-only">
+                        <div class="form-row"><label class="remember"><input type="checkbox"> Remember me</label><a
+                                href="#forgot">Forgot password?</a></div>
+                    </div>
+                    <button class="primary-button" id="submitButton" type="submit">Log in securely</button>
+                </form>
+                <p class="switch-copy" id="switchCopy">New to Saman Healthcare? <a href="#register"
+                        id="switchLink">Registration</a></p>
+                <p class="status" id="status" role="status"></p>
+            </div>
+        </section>
+    </main>
+    <script>
+        // Get references to the page elements that JavaScript needs to control.
+        const card = document.getElementById('authCard'), form = document.getElementById('authForm'), switchCopy = document.getElementById('switchCopy'), submitButton = document.getElementById('submitButton'), status = document.getElementById('status'), userId = document.getElementById('userId'), patientRole = document.getElementById('patientRole'), doctorRole = document.getElementById('doctorRole');
+
+        // Keep the selected account type so the ID hint matches the selected role.
+        let selectedRole = 'patient';
+
+        // Change the visible fields and text when the user selects a mode.
+        function setMode(registering) {
+            card.classList.toggle('register-mode', registering); submitButton.textContent = registering ? 'Complete registration' : 'Log in securely';
+            switchCopy.innerHTML = registering ? 'Already registered? <a href="#login" id="switchLink">Return to login</a>' : 'New to Saman Healthcare? <a href="#register" id="switchLink">Registration</a>'; document.getElementById('switchLink').addEventListener('click', event => { event.preventDefault(); setMode(!registering) }); status.textContent = '';
+        }
+
+        // Highlight the selected role and update the ID placeholder.
+        function setRole(role) {
+            selectedRole = role;
+            const isDoctor = role === 'doctor';
+            card.classList.toggle('doctor-mode', isDoctor);
+            patientRole.classList.toggle('active', !isDoctor);
+            doctorRole.classList.toggle('active', isDoctor);
+            patientRole.setAttribute('aria-pressed', String(!isDoctor));
+            doctorRole.setAttribute('aria-pressed', String(isDoctor));
+            userId.placeholder = isDoctor ? 'Enter your doctor ID' : 'Enter your patient ID';
+        }
+
+        // Connect the registration link to the mode-switching function.
+        document.getElementById('switchLink').addEventListener('click', event => { event.preventDefault(); setMode(true) });
+        patientRole.addEventListener('click', () => setRole('patient'));
+        doctorRole.addEventListener('click', () => setRole('doctor'));
+
+        // Stop the browser from reloading; this demo displays a confirmation message.
+        form.addEventListener('submit', event => { event.preventDefault(); status.textContent = card.classList.contains('register-mode') ? 'Your account details are ready to submit.' : 'Login details are ready to submit.' });
+    </script>
+</body>
+
+</html>
