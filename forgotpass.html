@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Saman Healthcare | Forgot Password</title>
+	<link rel="stylesheet" href="forgotpass.css">
+</head>
+
+<body>
+	<!-- The reset shell keeps the forgot-password page visually consistent with Login. -->
+	<main class="reset-shell">
+		<!-- The blue panel carries the same brand and welcome message as Login. -->
+		<section class="reset-welcome" aria-label="Saman Healthcare">
+			<div class="brand"><span class="brand-mark" aria-hidden="true">+</span> <span class="brand-text">Saman
+					Healthcare</span></div>
+			<div class="welcome-copy">
+				<p class="eyebrow">ACCOUNT RECOVERY</p>
+				<h1>Get back to your care.</h1>
+				<p>Verify your WhatsApp number and create a new password securely.</p>
+			</div>
+			<svg class="reset-cartoon" viewBox="0 0 220 240" aria-hidden="true">
+				<circle cx="110" cy="58" r="34" fill="#ffd0bf" />
+				<path d="M76 60c2-43 67-50 71-4-21-17-46-17-71 4Z" fill="#18246b" />
+				<path d="M58 112c25-22 79-22 104 0l20 104H38Z" fill="#fff" stroke="#58d9cf" stroke-width="6" />
+				<path d="M110 112v104M76 126l34 38 34-38" fill="none" stroke="#58d9cf" stroke-width="6" />
+				<path d="M70 216l-10 18m90-18 10 18" stroke="#58d9cf" stroke-width="16" stroke-linecap="round" />
+				<path d="M49 238h38m46 0h38" stroke="#fff" stroke-width="11" stroke-linecap="round" />
+				<path d="M153 124c19 13 28 32 31 55" fill="none" stroke="#ffd0bf" stroke-width="14"
+					stroke-linecap="round" />
+				<circle cx="187" cy="183" r="10" fill="#ffd46b" stroke="#1842d2" stroke-width="4" />
+				<circle cx="187" cy="183" r="3" fill="#fff" />
+				<path d="M196 183h19m-6 0v8m6-8v6" fill="none" stroke="#ffd46b" stroke-width="7" stroke-linecap="round"
+					stroke-linejoin="round" />
+			</svg>
+		</section>
+
+		<!-- The form first requests an OTP and then reveals the reset step. -->
+		<section class="reset-panel">
+			<div class="reset-card">
+				<h2>Forgot password?</h2>
+				<p class="intro-text">We will send a verification code to your WhatsApp number.</p>
+
+				<!-- Step one identifies the account that needs a password reset. -->
+				<form id="requestForm">
+					<div class="role-switch" role="group" aria-label="Account type">
+						<button class="active" id="patientRole" type="button" aria-pressed="true">Patient</button>
+						<button id="doctorRole" type="button" aria-pressed="false">Doctor</button>
+					</div>
+					<div class="field">
+						<label for="identifier">Patient phone number or ID</label>
+						<input id="identifier" type="text" placeholder="Enter your phone number or ID" required>
+					</div>
+					<button class="primary-button" type="submit">Send OTP to WhatsApp</button>
+				</form>
+
+				<!-- The OTP step stays hidden until Python creates a reset challenge. -->
+				<form id="resetForm" hidden>
+					<div class="field">
+						<label for="otp">6-digit OTP</label>
+						<input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+							pattern="[0-9]{6}" placeholder="Enter the code from WhatsApp" required>
+					</div>
+					<button class="primary-button" type="submit">Verify OTP</button>
+				</form>
+
+				<p class="status" id="status" role="status"></p>
+				<p class="back-link"><a href="loginround2.html">Back to login</a></p>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		// Keep the selected account type for the backend reset request.
+		let selectedRole = 'patient';
+		let resetChallengeId = '';
+
+		// Get references to the page controls used by the reset flow.
+		const patientRole = document.getElementById('patientRole');
+		const doctorRole = document.getElementById('doctorRole');
+		const requestForm = document.getElementById('requestForm');
+		const resetForm = document.getElementById('resetForm');
+		const identifier = document.getElementById('identifier');
+		const status = document.getElementById('status');
+
+		// Switch between Patient and Doctor account recovery.
+		function setRole(role) {
+			selectedRole = role;
+			const isDoctor = role === 'doctor';
+			patientRole.classList.toggle('active', !isDoctor);
+			doctorRole.classList.toggle('active', isDoctor);
+			patientRole.setAttribute('aria-pressed', String(!isDoctor));
+			doctorRole.setAttribute('aria-pressed', String(isDoctor));
+			identifier.previousElementSibling.textContent = `${isDoctor ? 'Doctor' : 'Patient'} phone number or ID`;
+			identifier.placeholder = `Enter your ${isDoctor ? 'doctor' : 'patient'} phone number or ID`;
+		}
+
+		patientRole.addEventListener('click', () => setRole('patient'));
+		doctorRole.addEventListener('click', () => setRole('doctor'));
+
+		// Ask Python to create and send a WhatsApp reset OTP.
+		requestForm.addEventListener('submit', async event => {
+			event.preventDefault();
+			status.textContent = 'Sending your verification code...';
+
+			try {
+				const response = await fetch('/api/forgot-password/request', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ role: selectedRole, identifier: identifier.value })
+				});
+				const result = await response.json();
+				status.textContent = result.message;
+
+				if (response.ok) {
+					resetChallengeId = result.challenge_id;
+					requestForm.hidden = true;
+					resetForm.hidden = false;
+					document.getElementById('otp').focus();
+				}
+			} catch (error) {
+				status.textContent = 'Cannot connect to the Python backend.';
+			}
+		});
+
+		// Verify the OTP before opening the password page.
+		resetForm.addEventListener('submit', async event => {
+			event.preventDefault();
+			status.textContent = 'Verifying OTP...';
+			try {
+				const response = await fetch('/api/forgot-password/verify', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						challenge_id: resetChallengeId,
+						otp: document.getElementById('otp').value
+					})
+				});
+				const result = await response.json();
+				status.textContent = result.message;
+
+				if (response.ok) {
+					// Open the separate password page only after OTP verification succeeds.
+					window.location.href = `resetpassword.html?token=${encodeURIComponent(result.reset_token)}`;
+				}
+			} catch (error) {
+				status.textContent = 'Cannot connect to the Python backend.';
+			}
+		});
+	</script>
+</body>
+
+</html>
