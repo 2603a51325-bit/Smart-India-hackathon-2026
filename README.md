@@ -1,1 +1,0 @@
-# Smart-India-hackathon-2026
