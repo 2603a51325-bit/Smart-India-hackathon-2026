@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patient Dashboard</title>
+    <link rel="stylesheet" href="doctor-dashround2.css">
+    <script src="api.js"></script>
+</head>
+<body>
+    <main class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="doctor-avatar patient-avatar-large" aria-hidden="true">PS</div>
+            <h1>Patient Dashboard</h1>
+            <p class="credentials">Manage your care, appointments, and health records</p>
+            <div class="sidebar-rule"></div>
+            <nav aria-label="Dashboard navigation">
+                <a class="active" href="#dashboard"><span>▦</span>Dashboard</a>
+                <a href="#current-appointment" onclick="openCurrentAppointment(event)"><span>▣</span>Current Appointment</a>
+                <a href="#available-doctors" onclick="openDoctors(event)"><span>♙</span>Available Doctors</a>
+                <a href="#doctor-details" onclick="openDoctorDetails(event)"><span>♙</span>Doctor Details</a>
+                <a href="#surgery-details" onclick="openSurgery(event)"><span>✚</span>Surgery Details</a>
+                <a href="#payments"><span>◈</span>Payments</a>
+                <a href="#prescriptions"><span>▥</span>Prescriptions</a>
+                <div class="sidebar-settings-label">ACCOUNT SETTINGS</div>
+                <a class="sidebar-settings-link" href="#patient-details-settings" onclick="openPatientDetailsSettings(event)"><span>👤</span>My Details</a>
+                <a class="sidebar-settings-link" href="#patient-security" onclick="openPatientSecurity(event)"><span>🔒</span>Two-step Verification</a>
+                <a class="sidebar-settings-link" href="#patient-password-settings" onclick="openPatientPasswordSettings(event)"><span>🔑</span>Change Password / PIN</a>
+                <a href="loginround2.html"><span>↪</span>Logout</a>
+            </nav>
+        </aside>
+
+        <section class="workspace" id="dashboard">
+            <header class="topbar">
+                <div><p class="eyebrow">YOUR HEALTH OVERVIEW</p><h2>Patient Dashboard</h2></div>
+                <div class="topbar-tools">
+                    <button class="notification-button" type="button" aria-label="Notifications" title="Notifications">
+                        <span class="bell-icon" aria-hidden="true">🔔</span>
+                        <span class="notification-count" id="notificationCount" hidden>0</span>
+                    </button>
+                </div>
+            </header>
+            <aside class="notification-panel" id="notificationPanel" hidden>
+                <div class="notification-panel-heading"><strong>Notifications</strong><button type="button" id="markNotificationsRead">Mark read</button></div>
+                <div id="notificationList"><p>No notifications yet.</p></div>
+            </aside>
+
+            <section class="metrics" aria-label="Summary metrics">
+                <button class="metric metric-action" id="book-appointment" type="button" onclick="openBooking()"><div class="metric-icon">＋</div><div><span>Book Appointment</span><strong>Find Care</strong><small>Choose a doctor</small></div></button>
+                <button class="metric metric-action" id="queue-status" type="button" onclick="openQueue()"><div class="metric-icon">◷</div><div><span>Queue Status</span><strong>04</strong><small>Patients before you</small></div></button>
+            </section>
+
+            <article class="current-appointment-banner panel" id="current-appointment">
+                <div><p class="panel-title">Current Appointment</p><h3 id="current-appointment-title">No appointment scheduled</h3><p id="current-appointment-date">Your upcoming appointments will appear here.</p></div>
+                <div class="appointment-banner-actions"><span class="appointment-state">Confirmed</span><button type="button" onclick="openCurrentAppointment()">View Details</button></div>
+            </article>
+
+            <article class="patient-details panel">
+                <div class="details-heading"><div><p class="panel-title">Patient Information</p><h3 id="dashboardPatientName">Loading...</h3></div><span class="patient-id-badge" id="dashboardPatientId">-</span></div>
+                <div class="details-grid">
+                    <span>Age<strong id="dashboardPatientAge">-</strong></span>
+                    <span>Gender<strong id="dashboardPatientGender">-</strong></span>
+                    <span>Contact Number<strong id="dashboardPatientPhone">-</strong></span>
+                    <span>Email<strong id="dashboardPatientEmail">-</strong></span>
+                    <span>Address<strong id="dashboardPatientAddress">-</strong></span>
+                </div>
+            </article>
+
+            <section class="care-options" aria-label="Patient records and payments">
+                <article class="care-panel panel" id="check-reports">
+                    <div class="care-panel-heading"><p class="panel-title">Check Reports</p><span id="report-count">0</span></div>
+                    <div id="report-list"><div class="care-row"><b>No reports yet</b></div></div>
+                </article>
+                <article class="care-panel panel" id="prescriptions">
+                    <div class="care-panel-heading"><p class="panel-title">Prescriptions</p><span id="prescription-count">0</span></div>
+                    <div id="prescription-list"><div class="care-row"><b>No prescriptions yet</b></div></div>
+                    <a class="see-all" href="#dashboard">Doctor instructions</a>
+                </article>
+                <article class="care-panel panel" id="payments">
+                    <div class="care-panel-heading"><p class="panel-title">Payments</p><span>Paid</span></div>
+                    <div class="care-row"><b>Consultation<small>Dr. Martin Deo · 21 Dec 2021</small></b><strong>₹800</strong></div>
+                    <div class="care-row"><b>Lab Reports<small>Health screening · 15 Dec 2021</small></b><strong>₹450</strong></div>
+                    <button class="payment-button" type="button" onclick="openCareDetail('Payment History', 'Consultation: ₹800 · Paid on 21 December 2021\nLab reports: ₹450 · Paid on 15 December 2021\nTotal paid: ₹1,250')">View Payment History</button>
+                </article>
+            </section>
+
+        </section>
+    </main>
+
+    <div class="patient-security-overlay" id="patientSecurityOverlay" hidden>
+        <section class="patient-security-modal" role="dialog" aria-modal="true" aria-labelledby="patientSecurityTitle">
+            <button class="booking-close" type="button" aria-label="Close security settings" onclick="closePatientSecurity()">×</button>
+            <p class="eyebrow">ACCOUNT SECURITY</p>
+            <h2 id="patientSecurityTitle">Two-step Password Verification</h2>
+            <p>Use your PIN for simple login. Enable this option to request your password after the PIN.</p>
+            <label class="patient-security-toggle"><input id="patientTwoStepToggle" type="checkbox"> Enable password verification after PIN</label>
+            <p class="booking-status" id="patientSecurityStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="patient-security-overlay" id="patientDetailsOverlay" hidden>
+        <section class="patient-security-modal" role="dialog" aria-modal="true" aria-labelledby="patientDetailsTitle">
+            <button class="booking-close" type="button" aria-label="Close patient details" onclick="closePatientDetailsSettings()">×</button>
+            <p class="eyebrow">ACCOUNT DETAILS</p>
+            <h2 id="patientDetailsTitle">My Details</h2>
+            <p>Update the information saved during registration.</p>
+            <form id="patientProfileForm">
+                <label class="patient-security-field">Name<input id="patientProfileName" required></label>
+                <label class="patient-security-field">Phone<input id="patientProfilePhone" type="tel" required></label>
+                <label class="patient-security-field">Email<input id="patientProfileEmail" type="email"></label>
+                <label class="patient-security-field">Date of birth<input id="patientProfileDob" type="date"></label>
+                <label class="patient-security-field">Aadhaar card (last 4 digits)<input id="patientProfileAadhaar" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Last 4 digits"></label>
+                <label class="patient-security-field">Age<input id="patientProfileAge" type="number"></label>
+                <label class="patient-security-field">Gender<input id="patientProfileGender"></label>
+                <label class="patient-security-field">Address<input id="patientProfileAddress"></label>
+                <label class="patient-security-field">Medical history<textarea id="patientProfileHistory" rows="3"></textarea></label>
+                <button class="booking-submit profile-save-button" type="submit">Save Updates</button>
+            </form>
+            <p class="booking-status" id="patientProfileStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="patient-security-overlay" id="patientPasswordOverlay" hidden>
+        <section class="patient-security-modal" role="dialog" aria-modal="true" aria-labelledby="patientPasswordTitle">
+            <button class="booking-close" type="button" aria-label="Close password settings" onclick="closePatientPasswordSettings()">×</button>
+            <p class="eyebrow">ACCOUNT SECURITY</p>
+            <h2 id="patientPasswordTitle">Change Password / PIN</h2>
+            <label class="patient-security-field">Current password<input id="patientCurrentPassword" type="password"></label>
+            <label class="patient-security-field">New password<input id="patientNewPassword" type="password" minlength="8"></label>
+            <label class="patient-security-field">Confirm new password<input id="patientConfirmPassword" type="password" minlength="8"></label>
+            <button class="booking-submit" id="changePatientPassword" type="button">Change Password</button>
+            <label class="patient-security-field">New security PIN<input id="patientChangePin" type="password" inputmode="numeric" maxlength="4"></label>
+            <label class="patient-security-field">Confirm security PIN<input id="patientChangePinConfirm" type="password" inputmode="numeric" maxlength="4"></label>
+            <button class="booking-submit" id="changePatientPin" type="button">Change PIN</button>
+            <p class="booking-status" id="patientPasswordStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="bookingOverlay" hidden>
+        <section class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
+            <button class="booking-close" type="button" aria-label="Close booking form" onclick="closeBooking()">×</button>
+            <p class="eyebrow">BOOK A VISIT</p>
+            <h2 id="bookingTitle">Find Care</h2>
+            <p class="booking-intro">Choose a doctor and request a convenient appointment.</p>
+            <form id="bookingForm">
+                <label for="bookingDoctor">Doctor</label>
+                <select id="bookingDoctor" required>
+                    <option value="">Select a doctor</option>
+                    <option value="D2001">Dr. Martin Deo · General Medicine</option>
+                    <option value="D2002">Dr. Priya Sharma · Cardiology</option>
+                    <option value="D2003">Dr. Arun Kumar · Internal Medicine</option>
+                </select>
+                <label for="bookingDate">Preferred date</label>
+                <input id="bookingDate" type="date" required>
+                <label for="bookingReason">Reason for visit</label>
+                <textarea id="bookingReason" rows="3" placeholder="Briefly describe your concern" required></textarea>
+                <button class="booking-submit" type="submit">Request Appointment</button>
+            </form>
+            <p class="booking-status" id="bookingStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="queueOverlay" hidden>
+        <section class="booking-modal queue-modal" role="dialog" aria-modal="true" aria-labelledby="queueTitle">
+            <button class="booking-close" type="button" aria-label="Close queue status" onclick="closeQueue()">×</button>
+            <p class="eyebrow">LIVE QUEUE</p>
+            <h2 id="queueTitle">Queue Status</h2>
+            <p class="booking-intro">Your appointment is moving forward in real time.</p>
+            <div class="queue-status-grid">
+                <div><span>Your token</span><strong>24</strong></div>
+                <div><span>Now serving</span><strong>20</strong></div>
+                <div><span>Patients ahead</span><strong>04</strong></div>
+                <div><span>Estimated wait</span><strong>30 min</strong></div>
+            </div>
+            <p class="booking-status queue-message">Please stay nearby. You will be notified when the doctor is ready.</p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="reportsOverlay" hidden>
+        <section class="booking-modal reports-modal" role="dialog" aria-modal="true" aria-labelledby="reportsTitle">
+            <button class="booking-close" type="button" aria-label="Close reports" onclick="closeReports()">×</button>
+            <p class="eyebrow">HEALTH RECORDS</p>
+            <h2 id="reportsTitle">Check Reports</h2>
+            <p class="booking-intro">Your latest medical reports are listed below.</p>
+            <div class="report-list">
+                <div class="report-item"><div><strong>Blood Test Report</strong><small>Updated 28 August 2026 · Normal</small></div><button type="button" onclick="showReportMessage('Blood Test Report selected.')">View</button></div>
+                <div class="report-item"><div><strong>Chest X-Ray</strong><small>Updated 15 August 2026 · Normal</small></div><button type="button" onclick="showReportMessage('Chest X-Ray selected.')">View</button></div>
+                <div class="report-item"><div><strong>Health Screening</strong><small>Updated 02 July 2026 · Ready</small></div><button type="button" onclick="showReportMessage('Health Screening selected.')">View</button></div>
+            </div>
+            <p class="booking-status" id="reportStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="surgeryOverlay" hidden>
+        <section class="booking-modal surgery-modal" role="dialog" aria-modal="true" aria-labelledby="surgeryTitle">
+            <button class="booking-close" type="button" aria-label="Close surgery details" onclick="closeSurgery()">×</button>
+            <p class="eyebrow">MEDICAL HISTORY</p>
+            <h2 id="surgeryTitle">Surgery Details</h2>
+            <div class="surgery-details">
+                <span>Surgery<strong>Appendectomy</strong></span>
+                <span>Date<strong>18 March 2022</strong></span>
+                <span>Surgeon<strong>Dr. Priya Sharma</strong></span>
+                <span>Hospital<strong>City Care Hospital</strong></span>
+                <span>Status<strong class="surgery-status">Recovered</strong></span>
+                <span>Follow-up<strong>Not required</strong></span>
+            </div>
+            <p class="booking-status">Your surgery record is available for your next consultation.</p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="doctorOverlay" hidden>
+        <section class="booking-modal doctor-modal" role="dialog" aria-modal="true" aria-labelledby="doctorTitle">
+            <button class="booking-close" type="button" aria-label="Close doctor details" onclick="closeDoctorDetails()">×</button>
+            <p class="eyebrow">YOUR CARE TEAM</p>
+            <h2 id="doctorTitle">Doctor Details</h2>
+            <div class="doctor-profile-head"><div class="doctor-mini-avatar">MD</div><div><strong>Dr. Martin Deo</strong><small>General Medicine</small></div></div>
+            <div class="doctor-details-grid">
+                <span>Doctor ID<strong>DOC100001</strong></span>
+                <span>Qualification<strong>MBBS, FCPS, MD</strong></span>
+                <span>Experience<strong>15 years</strong></span>
+                <span>Speciality<strong>General Medicine</strong></span>
+                <span>Clinic<strong>City Care Hospital</strong></span>
+                <span>Room<strong>101, 1st Floor</strong></span>
+                <span>Availability<strong>09:00 AM - 05:00 PM</strong></span>
+                <span>Contact<strong>+91 98765 12345</strong></span>
+            </div>
+            <p class="booking-status">Available for consultations and follow-up care.</p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="doctorsOverlay" hidden>
+        <section class="booking-modal doctors-modal" role="dialog" aria-modal="true" aria-labelledby="doctorsTitle">
+            <button class="booking-close" type="button" aria-label="Close available doctors" onclick="closeDoctors()">×</button>
+            <p class="eyebrow">CITY CARE HOSPITAL</p>
+            <h2 id="doctorsTitle">Available Doctors</h2>
+            <p class="booking-intro">Choose a specialist for your next appointment.</p>
+            <label class="doctor-filter-label" for="specializationFilter">Specialization</label>
+            <select class="doctor-filter" id="specializationFilter">
+                <option value="all">All Specializations</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Internal Medicine">Internal Medicine</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Orthopedics">Orthopedics</option>
+            </select>
+            <div class="doctor-list">
+                <div class="doctor-list-item" data-specialization="General Medicine"><i class="doctor-mini-avatar">MD</i><div><strong>Dr. Martin Deo</strong><small>General Medicine · Room 101</small></div><b class="available">Available</b></div>
+                <div class="doctor-list-item" data-specialization="Cardiology"><i class="doctor-mini-avatar">PS</i><div><strong>Dr. Priya Sharma</strong><small>Cardiology · Room 204</small></div><b class="available">Available</b></div>
+                <div class="doctor-list-item" data-specialization="Internal Medicine"><i class="doctor-mini-avatar">AK</i><div><strong>Dr. Arun Kumar</strong><small>Internal Medicine · Room 115</small></div><b class="busy-doctor">In consultation</b></div>
+                <div class="doctor-list-item" data-specialization="Pediatrics"><i class="doctor-mini-avatar">FN</i><div><strong>Dr. Farah Noor</strong><small>Pediatrics · Room 302</small></div><b class="available">Available</b></div>
+                <div class="doctor-list-item" data-specialization="Orthopedics"><i class="doctor-mini-avatar">RV</i><div><strong>Dr. Rahul Verma</strong><small>Orthopedics · Room 208</small></div><b class="available">Available</b></div>
+            </div>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="currentAppointmentOverlay" hidden>
+        <section class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="currentAppointmentTitle">
+            <button class="booking-close" type="button" aria-label="Close current appointment" onclick="closeCurrentAppointment()">×</button>
+            <p class="eyebrow">ACTIVE VISIT</p>
+            <h2 id="currentAppointmentTitle">Current Appointment</h2>
+            <div class="current-appointment-card">
+                <span class="appointment-state">Confirmed</span>
+                <h3>General Consultation</h3>
+                <p><b>Doctor:</b> Dr. Martin Deo</p>
+                <p><b>Date:</b> 21 December 2026</p>
+                <p><b>Time:</b> 10:30 AM</p>
+                <p><b>Room:</b> 101, 1st Floor</p>
+                <p><b>Reason:</b> Routine health checkup</p>
+            </div>
+            <button class="booking-submit" type="button" onclick="showCurrentAppointmentMessage()">Confirm Details</button>
+            <p class="booking-status" id="currentAppointmentStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="booking-overlay" id="careDetailOverlay" hidden>
+        <section class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="careDetailTitle">
+            <button class="booking-close" type="button" aria-label="Close details" onclick="closeCareDetail()">×</button>
+            <p class="eyebrow">PATIENT RECORD</p>
+            <h2 id="careDetailTitle">Details</h2>
+            <p class="care-detail-copy" id="careDetailCopy"></p>
+            <button class="booking-submit" type="button" onclick="closeCareDetail()">Close Record</button>
+        </section>
+    </div>
+
+    <script>
+        const bookingOverlay = document.getElementById('bookingOverlay');
+        const bookingForm = document.getElementById('bookingForm');
+        const bookingStatus = document.getElementById('bookingStatus');
+        const queueOverlay = document.getElementById('queueOverlay');
+        const reportsOverlay = document.getElementById('reportsOverlay');
+        const surgeryOverlay = document.getElementById('surgeryOverlay');
+        const doctorOverlay = document.getElementById('doctorOverlay');
+        const doctorsOverlay = document.getElementById('doctorsOverlay');
+        const currentAppointmentOverlay = document.getElementById('currentAppointmentOverlay');
+        const careDetailOverlay = document.getElementById('careDetailOverlay');
+        const specializationFilter = document.getElementById('specializationFilter');
+        const patientAccountIdentifier = sessionStorage.getItem('samanIdentifier') || '';
+
+        function openPatientSecurity(event) {
+            if (event) event.preventDefault();
+            document.getElementById('patientSecurityOverlay').hidden = false;
+        }
+
+        function closePatientSecurity() {
+            document.getElementById('patientSecurityOverlay').hidden = true;
+        }
+
+        function openPatientDetailsSettings(event) {
+            if (event) event.preventDefault();
+            document.getElementById('patientDetailsOverlay').hidden = false;
+            loadPatientProfile();
+        }
+
+        function closePatientDetailsSettings() {
+            document.getElementById('patientDetailsOverlay').hidden = true;
+        }
+
+        function openPatientPasswordSettings(event) {
+            if (event) event.preventDefault();
+            document.getElementById('patientPasswordOverlay').hidden = false;
+        }
+
+        function closePatientPasswordSettings() {
+            document.getElementById('patientPasswordOverlay').hidden = true;
+        }
+
+        async function loadPatientProfile() {
+            if (!patientAccountIdentifier) return;
+            try {
+            const response = await fetch(`${API.baseUrl}/profile`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get', role: 'patient', identifier: patientAccountIdentifier })
+            });
+            if (!response.ok) return;
+            const profile = (await response.json()).profile;
+            document.getElementById('dashboardPatientName').textContent = profile.name || '-';
+            document.getElementById('dashboardPatientId').textContent = profile.id || patientAccountIdentifier;
+            document.getElementById('dashboardPatientAge').textContent = profile.age || '-';
+            document.getElementById('dashboardPatientGender').textContent = profile.gender || '-';
+            document.getElementById('dashboardPatientPhone').textContent = profile.phone || '-';
+            document.getElementById('dashboardPatientEmail').textContent = profile.email || '-';
+            document.getElementById('dashboardPatientAddress').textContent = profile.address || '-';
+            document.getElementById('patientProfileName').value = profile.name || '';
+            document.getElementById('patientProfilePhone').value = profile.phone || '';
+            document.getElementById('patientProfileEmail').value = profile.email || '';
+            document.getElementById('patientProfileDob').value = profile.date_of_birth || '';
+            document.getElementById('patientProfileAadhaar').value = profile.aadhaar_last_4 || '';
+            document.getElementById('patientProfileAge').value = profile.age || '';
+            document.getElementById('patientProfileGender').value = profile.gender || '';
+            document.getElementById('patientProfileAddress').value = profile.address || '';
+            document.getElementById('patientProfileHistory').value = profile.medical_history || '';
+            } catch (error) {
+                console.error('Could not load patient profile:', error);
+            }
+        }
+
+        loadPatientProfile();
+
+        document.getElementById('patientProfileForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            try {
+            const response = await fetch(`${API.baseUrl}/profile`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update', role: 'patient', identifier: patientAccountIdentifier,
+                    name: document.getElementById('patientProfileName').value,
+                    phone: document.getElementById('patientProfilePhone').value,
+                    email: document.getElementById('patientProfileEmail').value,
+                    date_of_birth: document.getElementById('patientProfileDob').value,
+                    aadhaar_last_4: document.getElementById('patientProfileAadhaar').value,
+                    age: document.getElementById('patientProfileAge').value,
+                    gender: document.getElementById('patientProfileGender').value,
+                    address: document.getElementById('patientProfileAddress').value,
+                    medical_history: document.getElementById('patientProfileHistory').value
+                })
+            });
+            const result = await response.json();
+            document.getElementById('patientProfileStatus').textContent = response.ok ? 'Details updated successfully.' : (result.message || 'Could not update details.');
+            } catch (error) {
+                document.getElementById('patientProfileStatus').textContent = 'Cannot connect to the Python backend.';
+            }
+        });
+
+        document.getElementById('changePatientPassword').addEventListener('click', async () => {
+            const newPassword = document.getElementById('patientNewPassword').value;
+            const status = document.getElementById('patientPasswordStatus');
+            if (newPassword !== document.getElementById('patientConfirmPassword').value) {
+                status.textContent = 'New passwords do not match.';
+                return;
+            }
+            const response = await fetch(`${API.baseUrl}/account-password`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: 'patient', identifier: patientAccountIdentifier, current_password: document.getElementById('patientCurrentPassword').value, new_password: newPassword })
+            });
+            status.textContent = (await response.json()).message;
+        });
+
+        document.getElementById('changePatientPin').addEventListener('click', async () => {
+            const pin = document.getElementById('patientChangePin').value;
+            const status = document.getElementById('patientPasswordStatus');
+            if (!/^\d{4}$/.test(pin) || pin !== document.getElementById('patientChangePinConfirm').value) {
+                status.textContent = 'Enter matching 4-digit PINs.';
+                return;
+            }
+            const response = await fetch(`${API.baseUrl}/security/set-pin`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: 'patient', identifier: patientAccountIdentifier, pin })
+            });
+            status.textContent = (await response.json()).message;
+        });
+
+        async function loadPatientSecurity() {
+            if (!patientAccountIdentifier) return;
+            const response = await fetch(`${API.baseUrl}/security`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get', role: 'patient', identifier: patientAccountIdentifier })
+            });
+            if (response.ok) document.getElementById('patientTwoStepToggle').checked = (await response.json()).two_step_enabled;
+        }
+
+        document.getElementById('patientTwoStepToggle').addEventListener('change', async event => {
+            const enabled = event.target.checked;
+            document.getElementById('patientSecurityStatus').textContent = enabled
+                ? 'Password verification enabled after PIN.'
+                : 'Password verification disabled after PIN.';
+            const response = await fetch(`${API.baseUrl}/security`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', role: 'patient', identifier: patientAccountIdentifier, enabled })
+            });
+            document.getElementById('patientSecurityStatus').textContent = response.ok ? 'Two-step setting saved.' : 'Could not save setting.';
+        });
+
+        loadPatientSecurity();
+
+        function openBooking() {
+            bookingOverlay.hidden = false;
+            document.getElementById('bookingDoctor').focus();
+        }
+
+        function closeBooking() {
+            bookingOverlay.hidden = true;
+            bookingStatus.textContent = '';
+        }
+
+        function openQueue() {
+            queueOverlay.hidden = false;
+        }
+
+        function closeQueue() {
+            queueOverlay.hidden = true;
+        }
+
+        function openReports(event) {
+            event.preventDefault();
+            reportsOverlay.hidden = false;
+        }
+
+        function closeReports() {
+            reportsOverlay.hidden = true;
+            document.getElementById('reportStatus').textContent = '';
+        }
+
+        function showReportMessage(message) {
+            document.getElementById('reportStatus').textContent = message;
+        }
+
+        function openSurgery(event) {
+            event.preventDefault();
+            surgeryOverlay.hidden = false;
+        }
+
+        function closeSurgery() {
+            surgeryOverlay.hidden = true;
+        }
+
+        function openDoctorDetails(event) {
+            event.preventDefault();
+            doctorOverlay.hidden = false;
+        }
+
+        function closeDoctorDetails() {
+            doctorOverlay.hidden = true;
+        }
+
+        function openDoctors(event) {
+            event.preventDefault();
+            doctorsOverlay.hidden = false;
+        }
+
+        function closeDoctors() {
+            doctorsOverlay.hidden = true;
+        }
+
+        function openCurrentAppointment(event) {
+            if (event) event.preventDefault();
+            currentAppointmentOverlay.hidden = false;
+        }
+
+        function closeCurrentAppointment() {
+            currentAppointmentOverlay.hidden = true;
+        }
+
+        function showCurrentAppointmentMessage() {
+            document.getElementById('currentAppointmentStatus').textContent = 'Appointment details confirmed.';
+        }
+
+        function openCareDetail(title, details) {
+            document.getElementById('careDetailTitle').textContent = title;
+            document.getElementById('careDetailCopy').textContent = details;
+            careDetailOverlay.hidden = false;
+        }
+
+        function closeCareDetail() {
+            careDetailOverlay.hidden = true;
+        }
+
+        bookingOverlay.addEventListener('click', event => {
+            if (event.target === bookingOverlay) closeBooking();
+        });
+
+        queueOverlay.addEventListener('click', event => {
+            if (event.target === queueOverlay) closeQueue();
+        });
+
+        reportsOverlay.addEventListener('click', event => {
+            if (event.target === reportsOverlay) closeReports();
+        });
+
+        surgeryOverlay.addEventListener('click', event => {
+            if (event.target === surgeryOverlay) closeSurgery();
+        });
+
+        doctorOverlay.addEventListener('click', event => {
+            if (event.target === doctorOverlay) closeDoctorDetails();
+        });
+
+        doctorsOverlay.addEventListener('click', event => {
+            if (event.target === doctorsOverlay) closeDoctors();
+        });
+
+        currentAppointmentOverlay.addEventListener('click', event => {
+            if (event.target === currentAppointmentOverlay) closeCurrentAppointment();
+        });
+
+        careDetailOverlay.addEventListener('click', event => {
+            if (event.target === careDetailOverlay) closeCareDetail();
+        });
+
+        specializationFilter.addEventListener('change', () => {
+            const selectedSpecialization = specializationFilter.value;
+            document.querySelectorAll('.doctor-list-item').forEach(doctor => {
+                doctor.hidden = selectedSpecialization !== 'all' && doctor.dataset.specialization !== selectedSpecialization;
+            });
+        });
+
+        const patientIdentifier = sessionStorage.getItem('samanIdentifier') || '';
+        const notificationButton = document.querySelector('.notification-button');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const notificationList = document.getElementById('notificationList');
+        const notificationCount = document.getElementById('notificationCount');
+
+        async function loadNotifications() {
+            if (!patientIdentifier) return;
+            const response = await fetch(`${API.baseUrl}/notifications`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient_id: patientIdentifier })
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            notificationCount.textContent = data.unread;
+            notificationCount.hidden = !data.unread;
+            notificationList.innerHTML = data.notifications.length
+                ? data.notifications.map(item => `<p class="notification-item">${item.message}<small>${new Date(item.created_at).toLocaleString()}</small></p>`).join('')
+                : '<p>No notifications yet.</p>';
+        }
+
+        notificationButton.addEventListener('click', () => {
+            notificationPanel.hidden = !notificationPanel.hidden;
+            if (!notificationPanel.hidden) loadNotifications();
+        });
+        document.getElementById('markNotificationsRead').addEventListener('click', async () => {
+            await fetch(`${API.baseUrl}/notifications`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mark_read', recipient_id: patientIdentifier }) });
+            loadNotifications();
+        });
+        loadNotifications();
+
+        bookingForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const response = await API.addAppointment({
+                doctor_id: document.getElementById('bookingDoctor').value,
+                patient_id: patientIdentifier,
+                appointment_date: document.getElementById('bookingDate').value,
+                appointment_time: '09:00',
+                status: 'requested',
+                notes: document.getElementById('bookingReason').value
+            });
+            bookingStatus.textContent = response ? 'Appointment request sent. The doctor has been notified.' : 'Could not send appointment request.';
+            bookingForm.reset();
+            loadNotifications();
+        });
+
+        async function loadPatientRecords() {
+            const patientId = sessionStorage.getItem('samanIdentifier');
+            if (!patientId) return;
+
+            const [appointments, prescriptions, reports, referrals] = await Promise.all([
+                API.getAppointmentsByPatient(patientId),
+                API.getPrescriptions(patientId),
+                API.getLabReports(patientId),
+                API.getReferrals(patientId)
+            ]);
+
+            if (appointments.length) {
+                const appointment = appointments[0];
+                document.getElementById('current-appointment-title').textContent = `Appointment with Doctor ${appointment.doctor_id}`;
+                document.getElementById('current-appointment-date').textContent = `${appointment.appointment_date} · ${appointment.appointment_time} · ${appointment.status}`;
+            }
+
+            document.getElementById('prescription-count').textContent = prescriptions.length;
+            document.getElementById('prescription-list').innerHTML = prescriptions.length
+                ? prescriptions.map(item => `<div class="care-row"><b>${item.medicine_name}<small>${item.dosage} · ${item.frequency} · ${item.duration}</small></b><button type="button" onclick="openCareDetail('Prescription', '${item.medicine_name}: ${item.dosage}, ${item.frequency}, ${item.duration}')">View</button></div>`).join('')
+                : '<div class="care-row"><b>No prescriptions yet</b></div>';
+
+            document.getElementById('report-count').textContent = reports.length;
+            document.getElementById('report-list').innerHTML = reports.length
+                ? reports.map(item => `<div class="care-row"><b>${item.report_type}<small>${item.report_data}</small></b><button type="button" onclick="openCareDetail('Lab Report', '${item.report_type}: ${item.report_data}')">View</button></div>`).join('')
+                : '<div class="care-row"><b>No reports yet</b></div>';
+
+            const referralPanel = document.getElementById('payments');
+            if (referralPanel && referrals.length) {
+                referralPanel.querySelector('.care-panel-heading .panel-title').textContent = 'Referrals';
+                referralPanel.querySelector('.care-panel-heading span').textContent = referrals.length;
+                referralPanel.querySelector('.care-row').innerHTML = `<b>${referrals[0].referred_to}<small>${referrals[0].reason} · ${referrals[0].status}</small></b>`;
+            }
+        }
+
+        loadPatientRecords();
+    </script>
+</body>
+</html>

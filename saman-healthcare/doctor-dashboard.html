@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="doctor-dashboard.css">
+    <script src="api.js"></script>
+</head>
+<body>
+    <main class="shell">
+        <aside class="sidebar">
+            <div class="avatar">DR</div>
+            <h1>Doctor Portal</h1>
+            <p>Manage patients & appointments</p>
+            <nav>
+                <a class="active" href="#"><span>▦</span>Dashboard</a>
+                <a href="#" onclick="scroll('#patient-list')"><span>👥</span>Patients</a>
+                <a href="#" onclick="scroll('#appointments')"><span>📅</span>Appointments</a>
+                <a href="#" onclick="scroll('#attendance')"><span>✓</span>Attendance</a>
+                <a href="#" onclick="scroll('#actions')"><span>📊</span>Reports</a>
+                <a href="loginround2.html"><span>↪</span>Logout</a>
+            </nav>
+        </aside>
+
+        <section class="workspace">
+            <header class="topbar">
+                <h2>Patient Management</h2>
+                <button type="button">♟</button>
+            </header>
+
+            <section class="metrics" id="metrics-section">
+                <button class="metric" onclick="scroll('#appointments')"><strong>-</strong><small>Today's Appointments</small></button>
+                <button class="metric" onclick="scroll('#attendance')"><strong>-</strong><small>Patients Checked In</small></button>
+                <button class="metric" onclick="scroll('#patient-list')"><strong id="total-patients">-</strong><small>Total Patients</small></button>
+                <button class="metric"><strong>-</strong><small>Pending Reports</strong></button>
+            </section>
+
+            <article class="panel" id="appointments">
+                <h3>Today's Appointments</h3>
+                <div class="list" id="appointments-list">
+                    <p style="text-align:center; color: #999;">Loading appointments...</p>
+                </div>
+            </article>
+
+            <article class="panel" id="patient-list">
+                <h3>Your Patients</h3>
+                <div class="table" id="patients-table">
+                    <div class="row hdr">
+                        <div>Name</div><div>ID</div><div>Contact</div><div>Last Visit</div><div>Status</div><div></div>
+                    </div>
+                    <p style="text-align:center; color: #999;">Loading patients...</p>
+                </div>
+            </article>
+
+            <article class="panel" id="attendance">
+                <h3>Today's Attendance</h3>
+                <div class="list" id="attendance-list">
+                    <p style="text-align:center; color: #999;">Loading attendance...</p>
+                </div>
+            </article>
+
+            <article class="panel" id="actions">
+                <h3>Quick Actions</h3>
+                <div class="actions">
+                    <button onclick="alert('Open prescription form')">💊 Prescription</button>
+                    <button onclick="alert('Open report form')">📋 Lab Report</button>
+                    <button onclick="alert('Open appointment form')">📅 Appointment</button>
+                    <button onclick="alert('Open referral form')">🔄 Referral</button>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <div class="modal" id="modal" hidden>
+        <section class="modal-box">
+            <button class="close" onclick="closeModal()">×</button>
+            <h2>Patient Details</h2>
+            <div class="modal-content">
+                <div><strong>Name:</strong> <span id="mName">-</span></div>
+                <div><strong>ID:</strong> <span id="mID">-</span></div>
+                <div><strong>Age:</strong> <span id="mAge">-</span></div>
+                <div><strong>Gender:</strong> <span id="mGender">-</span></div>
+                <div><strong>Contact:</strong> <span id="mContact">-</span></div>
+                <div><strong>Medical History:</strong></div>
+                <ul id="mHistory"><li>Loading...</li></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="alert('Add prescription')">Add Prescription</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const scroll = id => document.querySelector(id).scrollIntoView({behavior:'smooth'});
+        
+        const showModal = async (id) => {
+            const patient = await API.getPatient(id);
+            if (patient) {
+                document.getElementById('mID').textContent = patient.id;
+                document.getElementById('mName').textContent = patient.name;
+                document.getElementById('mAge').textContent = patient.age || '-';
+                document.getElementById('mGender').textContent = patient.gender || '-';
+                document.getElementById('mContact').textContent = patient.phone || '-';
+                const history = patient.medical_history ? patient.medical_history.split(',') : ['None'];
+                document.getElementById('mHistory').innerHTML = history.map(h => `<li>${h.trim()}</li>`).join('');
+                document.getElementById('modal').hidden = false;
+            }
+        };
+        
+        const closeModal = () => document.getElementById('modal').hidden = true;
+        document.getElementById('modal').onclick = e => e.target.id === 'modal' && closeModal();
+
+        // Load data on page load
+        async function loadDashboard() {
+            try {
+                // Load patients
+                const patients = await API.getPatients();
+                document.getElementById('total-patients').textContent = patients.length;
+                
+                // Build patients table
+                let tableHtml = `<div class="row hdr">
+                    <div>Name</div><div>ID</div><div>Contact</div><div>Last Visit</div><div>Status</div><div></div>
+                </div>`;
+                
+                if (patients.length > 0) {
+                    tableHtml += patients.slice(0, 5).map(p => `
+                        <div class="row">
+                            <div>${p.name}</div>
+                            <div>${p.id}</div>
+                            <div>${p.phone}</div>
+                            <div>${new Date().toLocaleDateString()}</div>
+                            <span class="badge active">Active</span>
+                            <button class="btn-sm" onclick="showModal('${p.id}')">View</button>
+                        </div>
+                    `).join('');
+                } else {
+                    tableHtml += '<p style="text-align:center; color: #999; padding: 20px;">No patients found</p>';
+                }
+                
+                document.getElementById('patients-table').innerHTML = tableHtml;
+
+                // Load appointments
+                const appointments = await API.getAppointments();
+                let appointmentsHtml = '';
+                if (appointments.length > 0) {
+                    appointmentsHtml = appointments.slice(0, 3).map(a => `
+                        <div class="row">
+                            <span class="time">${a.appointment_time || '00:00'}</span>
+                            <div><strong>${a.patient_id}</strong><small>${a.appointment_date || new Date().toLocaleDateString()}</small></div>
+                            <span class="badge ${a.status || 'upcoming'}">${a.status || 'Upcoming'}</span>
+                            <button class="btn-sm" onclick="showModal('${a.patient_id}')">View</button>
+                        </div>
+                    `).join('');
+                } else {
+                    appointmentsHtml = '<p style="text-align:center; color: #999; padding: 20px;">No appointments</p>';
+                }
+                document.getElementById('appointments-list').innerHTML = appointmentsHtml;
+
+                // Load attendance
+                const attendance = await API.getAttendance();
+                let attendanceHtml = '';
+                if (attendance.length > 0) {
+                    attendanceHtml = attendance.slice(0, 3).map(a => `
+                        <div class="row attn">
+                            <div class="dot"></div>
+                            <div><strong>${a.patient_name}</strong><small>${a.id}</small></div>
+                            <div class="times"><span class="in">In: ${a.check_in_time || '-'}</span><span class="out">Out: ${a.check_out_time || 'Ongoing'}</span></div>
+                            <div>${a.duration_minutes || '-'} min</div>
+                        </div>
+                    `).join('');
+                } else {
+                    attendanceHtml = '<p style="text-align:center; color: #999; padding: 20px;">No attendance records</p>';
+                }
+                document.getElementById('attendance-list').innerHTML = attendanceHtml;
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

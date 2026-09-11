@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saman Healthcare | Patient Registration</title>
+    <link rel="stylesheet" href="registrationround2.css">
+    <script src="api.js"></script>
+</head>
+
+<body>
+    <main class="registration-shell">
+        <!-- Information side from the registration template. -->
+        <section class="information-panel">
+            <div class="intro-copy">
+                <h1 id="pageTitle">Patient Registration</h1>
+                <p>Create your account</p>
+            </div>
+
+            <article class="service-card trusted-card">
+                <span class="service-badge">24/7 SERVICE</span>
+                <h2>Trusted Care</h2>
+                <p>Professional medical support, fast assistance, and compassionate patient care around the clock.</p>
+                <ul>
+                    <li>Emergency help</li>
+                    <li>Expert doctors</li>
+                    <li>Online consultation</li>
+                </ul>
+            </article>
+
+            <article class="service-card services-card">
+                <h2>OUR SERVICES</h2>
+                <p>We provide comprehensive healthcare services including emergency treatment, specialist consultations,
+                    preventive screening, diagnostic care, pediatric support, and personalized patient management for
+                    your family.</p>
+            </article>
+
+            <svg class="hospital-illustration" viewBox="0 0 240 210" aria-hidden="true">
+                <path d="M28 190V65l92-40 92 40v125Z" fill="rgba(255,255,255,.1)" stroke="currentColor" stroke-width="5" stroke-linejoin="round" />
+                <path d="M88 190v-58h64v58M15 190h210M92 82h56M120 54v56" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M54 105h22m88 0h22M54 135h22m88 0h22" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <path d="M105 166h30" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            </svg>
+            <svg class="patient-illustration" viewBox="0 0 150 190" aria-hidden="true">
+                <circle cx="75" cy="38" r="25" fill="#d98676" />
+                <path d="M49 38c1-31 51-39 55-2-17-13-37-13-55 2Z" fill="#28245c" />
+                <path d="M38 92c17-18 57-18 74 0l14 76H24Z" fill="#f7f9ff" stroke="currentColor" stroke-width="4" />
+                <path d="M75 91v76M43 101l32 35 32-35" fill="none" stroke="#58d9cf" stroke-width="5" />
+                <path d="M42 168l-8 17m74-17 8 17" stroke="#39dbc9" stroke-width="13" stroke-linecap="round" />
+                <path d="M25 186h32m36 0h32" stroke="#f7f9ff" stroke-width="9" stroke-linecap="round" />
+            </svg>
+            <svg class="stethoscope-illustration" viewBox="0 0 150 180" aria-hidden="true">
+                <path d="M38 24v43c0 27 18 43 37 43s37-16 37-43V24M38 24h-9m9 0h9m59 0h-9m9 0h9" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
+                <path d="M75 110v18c0 16 11 27 26 27 12 0 21-8 21-19v-9" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
+                <circle cx="122" cy="122" r="13" fill="rgba(255,255,255,.12)" stroke="#58d9cf" stroke-width="5" />
+                <path d="M116 122h12m-6-6v12" stroke="#58d9cf" stroke-width="3" stroke-linecap="round" />
+            </svg>
+
+        </section>
+
+        <!-- Registration form side from the registration template. -->
+        <section class="form-panel">
+            <div class="form-card">
+                <div class="role-switch" role="group" aria-label="Registration type">
+                    <button class="active" id="patientTab" type="button" aria-pressed="true">Patient</button>
+                    <button id="doctorTab" type="button" aria-pressed="false">Doctor</button>
+                </div>
+
+                <form id="registrationForm">
+                    <div class="patient-fields">
+                        <div class="field-grid">
+                            <div class="field"><label for="patientName">Patient name</label><input id="patientName"
+                                type="text" placeholder="Enter patient name" required></div>
+                            <div class="field"><label for="dateOfBirth">Date of birth</label><input id="dateOfBirth"
+                                type="date" required></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="patientAadhaarLast4">Aadhaar card</label><input id="patientAadhaarLast4"
+                                type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Last 4 digits" required></div>
+                            <div class="field"><label for="guardianName">Guardian name</label><input id="guardianName"
+                                    type="text" placeholder="Enter guardian name"></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="gender">Gender</label><select id="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option>Female</option>
+                                    <option>Male</option>
+                                    <option>Other</option>
+                                    <option>Prefer not to say</option>
+                                </select></div>
+                            <div class="field"><label for="contactNumber">Contact number</label><input
+                                    id="contactNumber" type="tel" placeholder="Enter contact number" required></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="patientPassword">Password</label><input id="patientPassword"
+                                    type="password" placeholder="Create password" required></div>
+                            <div class="field"><label for="patientSecurityPin">Security PIN</label><input id="patientSecurityPin"
+                                type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Create 4-digit PIN" required></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="patientSecurityPinConfirm">Confirm PIN</label><input id="patientSecurityPinConfirm"
+                                type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Repeat PIN" required></div>
+                            <div class="field"><label for="patientPasswordCheck"> </label><input id="patientPasswordCheck" type="hidden" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <div class="doctor-fields">
+                        <div class="field">
+                            <label for="doctorType">Doctor type</label>
+                            <select id="doctorType">
+                                <option value="hospital">Hospital doctor</option>
+                                <option value="laboratory">Laboratory doctor</option>
+                            </select>
+                        </div>
+                        <div class="field-grid">
+                                <div class="field"><label for="doctorName">Doctor name</label><input id="doctorName"
+                                    type="text" placeholder="Enter doctor name" required></div>
+                            <div class="field"><label for="doctorLicense">License number</label><input
+                                    id="doctorLicense" type="text" placeholder="Enter license number"></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="doctorDateOfBirth">Date of birth</label><input id="doctorDateOfBirth"
+                                type="date" required></div>
+                            <div class="field"><label for="doctorAadhaarLast4">Aadhaar card</label><input id="doctorAadhaarLast4"
+                                type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Last 4 digits" required></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="specialization">Expertise category</label><select
+                                    id="specialization">
+                                    <option value="">Select expertise</option>
+                                </select></div>
+                            <div class="field"><label for="department">Department</label><select id="department">
+                                    <option value="">Select department</option>
+                                </select></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="hospital">Hospital or clinic</label><input id="hospital"
+                                    type="text" placeholder="Enter workplace"></div>
+                            <div class="field"><label for="doctorContact">Contact number</label><input
+                                    id="doctorContact" type="tel" placeholder="Enter contact number" required></div>
+                        </div>
+                        <div class="field-grid single-field">
+                            <div class="field"><label for="doctorPassword">Password</label><input id="doctorPassword"
+                                type="password" placeholder="Create password" minlength="8" required></div>
+                        </div>
+                        <div class="field-grid">
+                            <div class="field"><label for="doctorSecurityPin">Security PIN</label><input id="doctorSecurityPin"
+                                type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Create 4-digit PIN" required></div>
+                            <div class="field"><label for="doctorSecurityPinConfirm">Confirm PIN</label><input id="doctorSecurityPinConfirm"
+                                type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Repeat PIN" required></div>
+                        </div>
+                    </div>
+
+                    <button class="submit-button" id="submitButton" type="submit">Create Patient Account</button>
+                </form>
+                <p class="login-prompt">Already have an account? <a href="loginround2.html">Login</a></p>
+                <p class="status" id="status" role="status"></p>
+            </div>
+        </section>
+    </main>
+
+    <div class="account-modal" id="accountModal" hidden>
+        <section class="account-modal-card" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+            <button class="account-modal-close" id="accountModalClose" type="button" aria-label="Close account details">&times;</button>
+            <p class="account-modal-label">ACCOUNT CREATED</p>
+            <h2 id="accountModalTitle">Your patient ID is ready</h2>
+            <p>Use either your login ID or phone number with the password you created.</p>
+            <div class="login-detail"><span id="createdAccountLabel">Patient ID</span><strong id="createdAccountId">-</strong><button class="copy-detail" type="button" data-copy-target="createdAccountId">Copy</button></div>
+            <div class="login-detail"><span>Phone number</span><strong id="createdAccountPhone">-</strong><button class="copy-detail" type="button" data-copy-target="createdAccountPhone">Copy</button></div>
+            <p class="account-modal-status" id="accountModalStatus" role="status"></p>
+            <div class="account-modal-actions">
+                <button class="modal-secondary" id="accountModalCloseButton" type="button">Close</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Animate the page before moving back to the login screen.
+        document.querySelectorAll('a[href="loginround2.html"]').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                document.body.classList.add('page-exit');
+                window.setTimeout(() => { window.location.href = link.href; }, 260);
+            });
+        });
+
+        const patientTab = document.getElementById('patientTab');
+        const doctorTab = document.getElementById('doctorTab');
+        const registrationForm = document.getElementById('registrationForm');
+        const pageTitle = document.getElementById('pageTitle');
+        const submitButton = document.getElementById('submitButton');
+        const status = document.getElementById('status');
+        const doctorType = document.getElementById('doctorType');
+        const specialization = document.getElementById('specialization');
+        const department = document.getElementById('department');
+        const backendBase = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+        const patientRequiredFields = document.querySelectorAll('.patient-fields [required]');
+        const doctorRequiredFields = document.querySelectorAll('.doctor-fields [required]');
+        const accountModal = document.getElementById('accountModal');
+        const accountModalClose = document.getElementById('accountModalClose');
+        const accountModalCloseButton = document.getElementById('accountModalCloseButton');
+        const accountModalStatus = document.getElementById('accountModalStatus');
+        let createdAccount = null;
+
+        function closeAccountModal() {
+            accountModal.hidden = true;
+        }
+
+        accountModalClose.addEventListener('click', closeAccountModal);
+        accountModalCloseButton.addEventListener('click', closeAccountModal);
+        accountModal.addEventListener('click', event => {
+            if (event.target === accountModal) closeAccountModal();
+        });
+
+        document.querySelectorAll('.copy-detail').forEach(button => {
+            button.addEventListener('click', async () => {
+                const value = document.getElementById(button.dataset.copyTarget).textContent;
+                try {
+                    await navigator.clipboard.writeText(value);
+                    accountModalStatus.textContent = `${value} copied.`;
+                } catch (error) {
+                    accountModalStatus.textContent = 'Copy is unavailable. Select the value manually.';
+                }
+            });
+        });
+
+        // Suggest detailed expertise choices for each broad department.
+        const expertiseByDepartment = {
+            'Medical Services': ['General Medicine', 'Family Medicine', 'Cardiology', 'Dermatology', 'Neurology', 'Oncology'],
+            'Surgical Services': ['General Surgery', 'Orthopedic Surgery', 'Neurosurgery', 'Gynecological Surgery'],
+            'Emergency Services': ['Emergency Medicine', 'Trauma Care', 'Critical Care'],
+            'Outpatient Services': ['Family Medicine', 'Internal Medicine', 'Pediatrics', 'Psychiatry'],
+            'Diagnostic Services': ['Radiology', 'Pathology', 'Medical Imaging', 'Nuclear Medicine'],
+            'Inpatient Services': ['Internal Medicine', 'Cardiology', 'Neurology', 'Respiratory Medicine'],
+            'Maternal and Child Health': ['Pediatrics', 'Obstetrics', 'Gynecology', 'Neonatology'],
+            'Dental Services': ['General Dentistry', 'Orthodontics', 'Oral Surgery', 'Prosthodontics'],
+            'Pharmacy Services': ['Clinical Pharmacy', 'Hospital Pharmacy', 'Pharmacology'],
+            'Laboratory Services': ['Clinical Pathology', 'Hematology', 'Microbiology', 'Immunology', 'Biochemistry'],
+            'Clinical Pathology': ['Histopathology', 'Cytopathology', 'Anatomic Pathology'],
+            'Microbiology Laboratory': ['Bacteriology', 'Virology', 'Parasitology', 'Mycology'],
+            'Medical Testing': ['Molecular Diagnostics', 'Genetic Testing', 'Blood Bank Medicine', 'Toxicology']
+        };
+
+        // Rebuild the expertise menu whenever the department changes.
+        function updateExpertiseForDepartment() {
+            const choices = expertiseByDepartment[department.value] || [];
+            specialization.innerHTML = '<option value="">Select expertise</option>';
+            choices.forEach(option => specialization.add(new Option(option, option)));
+        }
+
+        // Keep department choices matched to the selected doctor type.
+        function updateDoctorChoices() {
+            const laboratoryDoctor = doctorType.value === 'laboratory';
+            const departmentOptions = laboratoryDoctor
+                ? ['Laboratory Services', 'Clinical Pathology', 'Microbiology Laboratory', 'Medical Testing']
+                : ['Medical Services', 'Surgical Services', 'Emergency Services', 'Outpatient Services', 'Diagnostic Services', 'Inpatient Services', 'Maternal and Child Health', 'Dental Services', 'Pharmacy Services'];
+
+            department.innerHTML = '<option value="">Select department</option>';
+            departmentOptions.forEach(option => department.add(new Option(option, option)));
+            updateExpertiseForDepartment();
+        }
+
+        function setRegistrationType(type) {
+            const isDoctor = type === 'doctor';
+            document.body.classList.toggle('doctor-mode', isDoctor);
+            patientTab.classList.toggle('active', !isDoctor);
+            doctorTab.classList.toggle('active', isDoctor);
+            patientTab.setAttribute('aria-pressed', String(!isDoctor));
+            doctorTab.setAttribute('aria-pressed', String(isDoctor));
+            pageTitle.textContent = isDoctor ? 'Doctor Registration' : 'Patient Registration';
+            submitButton.textContent = isDoctor ? 'Create Doctor Account' : 'Create Patient Account';
+            document.title = isDoctor ? 'Saman Healthcare | Doctor Registration' : 'Saman Healthcare | Patient Registration';
+            doctorType.required = isDoctor;
+            specialization.required = isDoctor;
+            department.required = isDoctor;
+            patientRequiredFields.forEach(field => { field.required = !isDoctor; });
+            doctorRequiredFields.forEach(field => { field.required = isDoctor; });
+            status.textContent = '';
+        }
+
+        patientTab.addEventListener('click', () => setRegistrationType('patient'));
+        doctorTab.addEventListener('click', () => setRegistrationType('doctor'));
+        doctorType.addEventListener('change', updateDoctorChoices);
+        department.addEventListener('change', updateExpertiseForDepartment);
+        setRegistrationType('patient');
+        updateDoctorChoices();
+        registrationForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            status.textContent = 'Creating your account...';
+
+            // Identify which registration fields should be sent to Python.
+            const isDoctor = doctorTab.classList.contains('active');
+            
+            // Build registration data based on account type
+            const registrationRequest = {
+                role: isDoctor ? 'doctor' : 'patient'
+            };
+
+            if (isDoctor) {
+                registrationRequest.name = document.getElementById('doctorName').value;
+                registrationRequest.phone = document.getElementById('doctorContact').value;
+                registrationRequest.email = document.getElementById('doctorContact').value.replace(/\d/g, '').substring(0, 5) + '@hospital.com';
+                registrationRequest.password = document.getElementById('doctorPassword').value;
+                registrationRequest.security_pin = document.getElementById('doctorSecurityPin').value;
+                registrationRequest.date_of_birth = document.getElementById('doctorDateOfBirth').value;
+                registrationRequest.aadhaar_last_4 = document.getElementById('doctorAadhaarLast4').value;
+                if (registrationRequest.security_pin !== document.getElementById('doctorSecurityPinConfirm').value) {
+                    status.textContent = 'Doctor PINs do not match.';
+                    return;
+                }
+                registrationRequest.specialization = document.getElementById('specialization').value;
+                registrationRequest.doctor_type = document.getElementById('doctorType').value;
+                registrationRequest.license_number = document.getElementById('doctorLicense').value;
+                registrationRequest.department = document.getElementById('department').value;
+                registrationRequest.hospital = document.getElementById('hospital').value;
+                registrationRequest.qualification = 'MBBS';
+                registrationRequest.experience = 0;
+            } else {
+                registrationRequest.name = document.getElementById('patientName').value;
+                registrationRequest.phone = document.getElementById('contactNumber').value;
+                registrationRequest.email = registrationRequest.phone.replace(/\d/g, '').substring(0, 5) + '@patient.com';
+                registrationRequest.password = document.getElementById('patientPassword').value;
+                registrationRequest.security_pin = document.getElementById('patientSecurityPin').value;
+                registrationRequest.date_of_birth = document.getElementById('dateOfBirth').value;
+                registrationRequest.aadhaar_last_4 = document.getElementById('patientAadhaarLast4').value;
+                if (registrationRequest.security_pin !== document.getElementById('patientSecurityPinConfirm').value) {
+                    status.textContent = 'Patient PINs do not match.';
+                    return;
+                }
+                
+                // Calculate age from date of birth
+                const dob = new Date(document.getElementById('dateOfBirth').value);
+                const today = new Date();
+                registrationRequest.age = today.getFullYear() - dob.getFullYear();
+                
+                registrationRequest.gender = document.getElementById('gender').value;
+            }
+
+            try {
+                // Send the registration data to the Python backend as JSON.
+                const response = await fetch(`${backendBase}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registrationRequest)
+                });
+                const result = await response.json();
+
+                // Redirect only after Python confirms that the account was created.
+                if (!response.ok) {
+                    status.textContent = result.message;
+                    return;
+                }
+
+                createdAccount = {
+                    role: result.role,
+                    account_id: result.account_id,
+                    phone: result.phone
+                };
+                const accountType = result.role === 'doctor' ? 'doctor' : 'patient';
+                document.getElementById('accountModalTitle').textContent = `Your ${accountType} ID is ready`;
+                document.getElementById('createdAccountLabel').textContent = `${accountType.charAt(0).toUpperCase() + accountType.slice(1)} ID`;
+                document.getElementById('createdAccountId').textContent = result.account_id;
+                document.getElementById('createdAccountPhone').textContent = result.phone;
+                accountModalStatus.textContent = '';
+                accountModal.hidden = false;
+                status.textContent = result.message;
+            } catch (error) {
+                // Explain when the registration page is not being served by Python.
+                status.textContent = 'Cannot connect to the Python backend.';
+            }
+        });
+    </script>
+</body>
+
+</html>

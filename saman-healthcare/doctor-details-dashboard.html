@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctor Dashboard - Patient Management</title>
+    <link rel="stylesheet" href="doctor-details-dashboard.css">
+    <script src="api.js"></script>
+</head>
+<body>
+    <main class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="doctor-avatar doctor-avatar-large" aria-hidden="true">DR</div>
+            <h1>Doctor Portal</h1>
+            <p class="credentials">Manage patients, appointments & attendance</p>
+            <div class="sidebar-rule"></div>
+            <nav aria-label="Doctor Dashboard navigation">
+                <a class="active" href="#dashboard"><span>▦</span>Dashboard</a>
+                <a href="#patient-list" onclick="openPatientList(event)"><span>👥</span>Patients List</a>
+                <a href="#today-appointments" onclick="openTodayAppointments(event)"><span>📅</span>Today's Appointments</a>
+                <a href="#attendance" onclick="openAttendance(event)"><span>✓</span>Attendance</a>
+                <a href="#patient-details" onclick="openPatientSearch(event)"><span>🔍</span>Search Patient</a>
+                <a href="#schedule" onclick="openSchedule(event)"><span>⏰</span>My Schedule</a>
+                <a href="#reports" onclick="openReports(event)"><span>📊</span>Reports</a>
+                <div class="sidebar-settings-label">ACCOUNT SETTINGS</div>
+                <a class="sidebar-settings-link" href="#my-details" onclick="openMyDetails(event)"><span>👤</span>My Details</a>
+                <a class="sidebar-settings-link" href="#security-settings" onclick="openSecuritySettings(event)"><span>🔒</span>Two-step Verification</a>
+                <a class="sidebar-settings-link" href="#password-settings" onclick="openPasswordSettings(event)"><span>🔑</span>Change Password / PIN</a>
+                <a href="loginround2.html"><span>↪</span>Logout</a>
+            </nav>
+        </aside>
+
+        <section class="workspace" id="dashboard">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">WELCOME DOCTOR</p>
+                    <h2>Patient Management Dashboard</h2>
+                </div>
+                <div class="topbar-tools">
+                    <button class="notification-button" type="button" aria-label="Notifications" title="Notifications">
+                        <span class="bell-icon" aria-hidden="true">🔔</span>
+                        <span class="notification-count" id="notificationCount" hidden>0</span>
+                    </button>
+                </div>
+            </header>
+            <aside class="notification-panel" id="notificationPanel" hidden>
+                <div class="notification-panel-heading"><strong>Notifications</strong><button type="button" id="markNotificationsRead">Mark read</button></div>
+                <div id="notificationList"><p>No notifications yet.</p></div>
+            </aside>
+
+            <section class="metrics" aria-label="Summary metrics">
+                <button class="metric metric-action" type="button" onclick="openTodayAppointments()">
+                    <div class="metric-icon">📅</div>
+                    <div>
+                        <span>Today's Appointments</span>
+                        <strong>8</strong>
+                        <small>Scheduled</small>
+                    </div>
+                </button>
+                <button class="metric metric-action" type="button" onclick="openAttendance()">
+                    <div class="metric-icon">✓</div>
+                    <div>
+                        <span>Today's Attendance</span>
+                        <strong>6/8</strong>
+                        <small>Patients checked in</small>
+                    </div>
+                </button>
+                <button class="metric metric-action" type="button" onclick="openPatientList()">
+                    <div class="metric-icon">👥</div>
+                    <div>
+                        <span>Total Patients</span>
+                        <strong>156</strong>
+                        <small>Under your care</small>
+                    </div>
+                </button>
+                <button class="metric metric-action" type="button" onclick="openPendingReports()">
+                    <div class="metric-icon">📋</div>
+                    <div>
+                        <span>Pending Reports</span>
+                        <strong>5</strong>
+                        <small>To be reviewed</small>
+                    </div>
+                </button>
+            </section>
+
+            <!-- Today's Appointments Section -->
+            <article class="appointments-panel panel" id="today-appointments">
+                <div class="section-heading">
+                    <div>
+                        <p class="panel-title">Today's Appointments</p>
+                        <h3>December 21, 2026</h3>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="openTodayAppointments()">View All</button>
+                </div>
+                <div class="appointments-list">
+                    <div class="appointment-row">
+                        <div class="appointment-time">09:30 AM</div>
+                        <div class="appointment-info">
+                            <strong>Sanath Deo</strong>
+                            <span class="patient-id">ID: P100245</span>
+                            <small>General Consultation · Room 101</small>
+                        </div>
+                        <div class="appointment-status completed">Completed</div>
+                        <button type="button" class="btn-small" onclick="openPatientDetail('P100245')">View</button>
+                    </div>
+                    <div class="appointment-row">
+                        <div class="appointment-time">10:15 AM</div>
+                        <div class="appointment-info">
+                            <strong>Priya Sharma</strong>
+                            <span class="patient-id">ID: P100246</span>
+                            <small>Follow-up Checkup · Room 101</small>
+                        </div>
+                        <div class="appointment-status ongoing">Ongoing</div>
+                        <button type="button" class="btn-small" onclick="openPatientDetail('P100246')">View</button>
+                    </div>
+                    <div class="appointment-row">
+                        <div class="appointment-time">11:00 AM</div>
+                        <div class="appointment-info">
+                            <strong>Rajesh Kumar</strong>
+                            <span class="patient-id">ID: P100247</span>
+                            <small>Routine Checkup · Room 102</small>
+                        </div>
+                        <div class="appointment-status upcoming">Upcoming</div>
+                        <button type="button" class="btn-small" onclick="openPatientDetail('P100247')">View</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Patient Details Section -->
+            <article class="patient-info-panel panel" id="patient-details">
+                <div class="section-heading">
+                    <p class="panel-title">Patient Information</p>
+                </div>
+                <div class="patient-card">
+                    <div class="patient-header">
+                        <div class="patient-avatar">SD</div>
+                        <div class="patient-meta">
+                            <h3><input id="patientInfoName" value="Demo Patient"></h3>
+                            <span class="patient-id-badge" id="patientInfoId">P1001</span>
+                        </div>
+                    </div>
+                    <div class="details-grid">
+                        <label><strong>Age:</strong><input id="patientInfoAge" type="number"></label>
+                        <label><strong>Gender:</strong><input id="patientInfoGender"></label>
+                        <label><strong>Contact:</strong><input id="patientInfoPhone" type="tel"></label>
+                        <label><strong>Email:</strong><input id="patientInfoEmail" type="email"></label>
+                        <label><strong>Address:</strong><input id="patientInfoAddress"></label>
+                    </div>
+                    <div class="medical-info">
+                        <h4>Medical History</h4>
+                        <textarea id="patientInfoHistory" rows="3" placeholder="Medical history"></textarea>
+                    </div>
+                    <label class="visit-status-control" for="visitStatus">Visit status
+                        <select id="visitStatus">
+                            <option value="requested">Requested</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </label>
+                    <p id="visitStatusMessage" role="status"></p>
+                    <div class="patient-info-actions">
+                        <button class="btn-primary" type="button" id="savePatientInfo">Save Updates</button>
+                        <button class="btn-secondary" type="button" id="nextPatient">Next Patient</button>
+                    </div>
+                    <p id="patientInfoMessage" role="status"></p>
+                </div>
+            </article>
+
+            <article class="account-settings-panel panel" id="my-details" hidden>
+                <button class="settings-popup-close" type="button" onclick="closeAccountPopup('my-details')">×</button>
+                <div class="section-heading"><p class="panel-title">My Details</p></div>
+                <p class="settings-popup-intro">These details come from your registration and can be updated.</p>
+                <form id="profileForm" class="profile-form">
+                    <label>Name<input id="profileName" required></label>
+                    <label>Phone<input id="profilePhone" type="tel" required></label>
+                    <label>Email<input id="profileEmail" type="email"></label>
+                    <label>Date of birth<input id="profileDateOfBirth" type="date"></label>
+                    <label>Aadhaar card (last 4 digits)<input id="profileAadhaarLast4" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Last 4 digits"></label>
+                    <label>Doctor type<input id="profileDoctorType"></label>
+                    <label>License number<input id="profileLicenseNumber"></label>
+                    <label>Department<input id="profileDepartment"></label>
+                    <label>Specialization<input id="profileSpecialization"></label>
+                    <label>Qualification<input id="profileQualification"></label>
+                    <label>Experience<input id="profileExperience" type="number" min="0"></label>
+                    <label>Hospital or clinic<input id="profileHospital"></label>
+                    <label>Clinic address<input id="profileAddress"></label>
+                    <button class="btn-primary profile-save-button" type="submit">Save Updates</button>
+                    <p id="profileStatus" role="status"></p>
+                </form>
+            </article>
+
+            <article class="account-settings-panel panel" id="security-settings" hidden>
+                <button class="settings-popup-close" type="button" onclick="closeAccountPopup('security-settings')">×</button>
+                <div class="section-heading"><p class="panel-title">Two-step Password Verification</p></div>
+                <p class="settings-popup-intro">Use the PIN for simple login. Enable this option to request your account password in a popup after the PIN.</p>
+                <label class="security-toggle"><input id="twoStepToggle" type="checkbox"> Enable password verification after PIN</label>
+                <p id="securityStatus" role="status"></p>
+            </article>
+
+            <article class="account-settings-panel panel" id="password-settings" hidden>
+                <button class="settings-popup-close" type="button" onclick="closeAccountPopup('password-settings')">×</button>
+                <div class="section-heading"><p class="panel-title">Change Password / PIN</p></div>
+                <p class="settings-popup-intro">Update the password used on the login page and your optional security PIN.</p>
+                <form id="passwordForm" class="profile-form">
+                    <label>Current password<input id="currentPassword" type="password" required></label>
+                    <label>New password<input id="newPassword" type="password" minlength="8" required></label>
+                    <label>Confirm new password<input id="confirmNewPassword" type="password" minlength="8" required></label>
+                    <button class="btn-primary" type="submit">Change Login Password</button>
+                </form>
+                <div class="password-pin-divider"></div>
+                <label class="security-otp-label">New security PIN<input id="passwordPopupPin" type="password" inputmode="numeric" maxlength="4" placeholder="4 digits"></label>
+                <label class="security-otp-label">Confirm security PIN<input id="passwordPopupPinConfirm" type="password" inputmode="numeric" maxlength="4" placeholder="Repeat PIN"></label>
+                <button class="btn-secondary" id="savePopupPin" type="button">Change Security PIN</button>
+                <p id="passwordStatus" role="status"></p>
+            </article>
+
+            <!-- Attendance Tracking Section -->
+            <section class="attendance-section" aria-label="Attendance tracking">
+                <article class="attendance-panel panel" id="attendance">
+                    <div class="section-heading">
+                        <div>
+                            <p class="panel-title">Today's Attendance</p>
+                            <h3>Check In/Out Tracking</h3>
+                        </div>
+                    </div>
+                    <div class="attendance-list">
+                        <div class="attendance-row checked-in">
+                            <div class="status-indicator"></div>
+                            <div class="attendance-info">
+                                <strong>Sanath Deo</strong>
+                                <span>P100245</span>
+                            </div>
+                            <div class="time-info">
+                                <span class="check-in">Check In: 09:25 AM</span>
+                                <span class="check-out">Check Out: 09:45 AM</span>
+                            </div>
+                            <div class="duration">20 min</div>
+                        </div>
+                        <div class="attendance-row checked-in">
+                            <div class="status-indicator"></div>
+                            <div class="attendance-info">
+                                <strong>Priya Sharma</strong>
+                                <span>P100246</span>
+                            </div>
+                            <div class="time-info">
+                                <span class="check-in">Check In: 10:10 AM</span>
+                                <span class="ongoing">Ongoing...</span>
+                            </div>
+                            <div class="duration">8 min</div>
+                        </div>
+                        <div class="attendance-row pending">
+                            <div class="status-indicator"></div>
+                            <div class="attendance-info">
+                                <strong>Rajesh Kumar</strong>
+                                <span>P100247</span>
+                            </div>
+                            <div class="time-info">
+                                <span class="pending-status">Pending Check In</span>
+                            </div>
+                            <div class="duration">-</div>
+                        </div>
+                        <div class="attendance-row pending">
+                            <div class="status-indicator"></div>
+                            <div class="attendance-info">
+                                <strong>Aisha Khan</strong>
+                                <span>P100248</span>
+                            </div>
+                            <div class="time-info">
+                                <span class="pending-status">Pending Check In</span>
+                            </div>
+                            <div class="duration">-</div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Patient List Section -->
+            <section class="patient-list-section" aria-label="Patient list">
+                <article class="patient-list-panel panel" id="patient-list">
+                    <div class="section-heading">
+                        <div>
+                            <p class="panel-title">Your Patients</p>
+                            <h3>Recent Patient List</h3>
+                        </div>
+                        <input type="text" class="search-input" placeholder="Search by name or ID...">
+                    </div>
+                    <div class="patients-table">
+                        <div class="table-header">
+                            <div>Patient Name</div>
+                            <div>ID</div>
+                            <div>Contact</div>
+                            <div>Last Visit</div>
+                            <div>Status</div>
+                            <div>Action</div>
+                        </div>
+                        <div class="table-row">
+                            <div>Sanath Deo</div>
+                            <div>P100245</div>
+                            <div>+91 98765 43210</div>
+                            <div>21 Dec 2026</div>
+                            <div><span class="status-badge active">Active</span></div>
+                            <div><button class="btn-small" onclick="openPatientDetail('P100245')">View</button></div>
+                        </div>
+                        <div class="table-row">
+                            <div>Priya Sharma</div>
+                            <div>P100246</div>
+                            <div>+91 87654 32109</div>
+                            <div>21 Dec 2026</div>
+                            <div><span class="status-badge active">Active</span></div>
+                            <div><button class="btn-small" onclick="openPatientDetail('P100246')">View</button></div>
+                        </div>
+                        <div class="table-row">
+                            <div>Rajesh Kumar</div>
+                            <div>P100247</div>
+                            <div>+91 76543 21098</div>
+                            <div>20 Dec 2026</div>
+                            <div><span class="status-badge inactive">Inactive</span></div>
+                            <div><button class="btn-small" onclick="openPatientDetail('P100247')">View</button></div>
+                        </div>
+                        <div class="table-row">
+                            <div>Aisha Khan</div>
+                            <div>P100248</div>
+                            <div>+91 65432 10987</div>
+                            <div>18 Dec 2026</div>
+                            <div><span class="status-badge active">Active</span></div>
+                            <div><button class="btn-small" onclick="openPatientDetail('P100248')">View</button></div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions-section">
+                <article class="actions-panel panel">
+                    <div class="section-heading">
+                        <p class="panel-title">Quick Actions</p>
+                    </div>
+                    <div class="actions-grid">
+                        <button class="action-btn" type="button" onclick="openNewPrescription()">
+                            <span class="action-icon">💊</span>
+                            <span>Create Prescription</span>
+                        </button>
+                        <button class="action-btn" type="button" onclick="openNewReport()">
+                            <span class="action-icon">📋</span>
+                            <span>Add Lab Report</span>
+                        </button>
+                        <button class="action-btn" type="button" onclick="openBookAppointment()">
+                            <span class="action-icon">📅</span>
+                            <span>Book Appointment</span>
+                        </button>
+                        <button class="action-btn" type="button" onclick="openReferral()">
+                            <span class="action-icon">🔄</span>
+                            <span>Create Referral</span>
+                        </button>
+                    </div>
+                </article>
+            </section>
+
+        </section>
+    </main>
+
+    <!-- Patient Detail Modal -->
+    <div class="modal-overlay" id="patientDetailModal" hidden>
+        <section class="modal-content" role="dialog" aria-modal="true">
+            <button class="modal-close" type="button" aria-label="Close modal" onclick="closePatientDetail()">×</button>
+            <div class="modal-header">
+                <h2>Patient Details</h2>
+            </div>
+            <div class="modal-body">
+                <div class="patient-detail-section">
+                    <h3>Personal Information</h3>
+                    <div class="info-grid">
+                        <div><strong>Full Name:</strong> <span id="patientName">-</span></div>
+                        <div><strong>Patient ID:</strong> <span id="patientID">-</span></div>
+                        <div><strong>Date of Birth:</strong> <span>15 January 1989</span></div>
+                        <div><strong>Gender:</strong> <span>Male</span></div>
+                    </div>
+                </div>
+
+                <div class="patient-detail-section">
+                    <h3>Contact Information</h3>
+                    <div class="info-grid">
+                        <div><strong>Phone:</strong> <span>+91 98765 43210</span></div>
+                        <div><strong>Email:</strong> <span>sanath.deo@example.com</span></div>
+                        <div><strong>Address:</strong> <span>New Delhi, India</span></div>
+                    </div>
+                </div>
+
+                <div class="patient-detail-section">
+                    <h3>Medical History</h3>
+                    <ul class="medical-list">
+                        <li>Hypertension (controlled)</li>
+                        <li>Diabetes Type 2</li>
+                        <li>Previous Appendectomy (2015)</li>
+                        <li>Drug Allergy: Penicillin</li>
+                    </ul>
+                </div>
+
+                <div class="patient-detail-section">
+                    <h3>Recent Visits</h3>
+                    <div class="visit-list">
+                        <div class="visit-item">
+                            <strong>21 December 2026</strong>
+                            <small>General Consultation - Dr. Name</small>
+                        </div>
+                        <div class="visit-item">
+                            <strong>15 December 2026</strong>
+                            <small>Follow-up Checkup - Dr. Name</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" type="button" onclick="closePatientDetail()">Close</button>
+                <button class="btn-primary" type="button" onclick="openNewPrescription()">Add Prescription</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Navigation functions
+        function openPatientList(e) {
+            if (e) e.preventDefault();
+            document.getElementById('patient-list').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openTodayAppointments(e) {
+            if (e) e.preventDefault();
+            document.getElementById('today-appointments').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openAttendance(e) {
+            if (e) e.preventDefault();
+            document.getElementById('attendance').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openPatientSearch(e) {
+            if (e) e.preventDefault();
+            document.getElementById('patient-details').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openSchedule(e) {
+            if (e) e.preventDefault();
+            alert('Schedule view coming soon');
+        }
+
+        function openReports(e) {
+            if (e) e.preventDefault();
+            alert('Reports view coming soon');
+        }
+
+        const accountRole = sessionStorage.getItem('samanRole') || 'doctor';
+        const accountIdentifier = sessionStorage.getItem('samanIdentifier') || '';
+        let securityChallengeId = '';
+
+        function openMyDetails(e) {
+            if (e) e.preventDefault();
+            document.getElementById('my-details').hidden = false;
+        }
+
+        function openSecuritySettings(e) {
+            if (e) e.preventDefault();
+            document.getElementById('security-settings').hidden = false;
+        }
+
+        function openPasswordSettings(e) {
+            if (e) e.preventDefault();
+            document.getElementById('password-settings').hidden = false;
+        }
+
+        function closeAccountPopup(id) {
+            document.getElementById(id).hidden = true;
+        }
+
+        async function loadAccountSettings() {
+            if (!accountIdentifier) return;
+            const profileResponse = await fetch(`${API.baseUrl}/profile`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get', role: accountRole, identifier: accountIdentifier })
+            });
+            if (profileResponse.ok) {
+                const profile = (await profileResponse.json()).profile;
+                document.getElementById('profileName').value = profile.name || '';
+                document.getElementById('profilePhone').value = profile.phone || '';
+                document.getElementById('profileEmail').value = profile.email || '';
+                document.getElementById('profileDateOfBirth').value = profile.date_of_birth || '';
+                document.getElementById('profileAadhaarLast4').value = profile.aadhaar_last_4 || '';
+                document.getElementById('profileDoctorType').value = profile.doctor_type || '';
+                document.getElementById('profileLicenseNumber').value = profile.license_number || '';
+                document.getElementById('profileDepartment').value = profile.department || '';
+                document.getElementById('profileSpecialization').value = profile.specialization || '';
+                document.getElementById('profileQualification').value = profile.qualification || '';
+                document.getElementById('profileExperience').value = profile.experience || '';
+                document.getElementById('profileHospital').value = profile.hospital || '';
+                document.getElementById('profileAddress').value = profile.clinic_address || profile.address || '';
+            }
+            const securityResponse = await fetch(`${API.baseUrl}/security`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get', role: accountRole, identifier: accountIdentifier })
+            });
+            if (securityResponse.ok) {
+                document.getElementById('twoStepToggle').checked = (await securityResponse.json()).two_step_enabled;
+            }
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            try {
+                const response = await fetch(`${API.baseUrl}/profile`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                    action: 'update', role: accountRole, identifier: accountIdentifier,
+                    name: document.getElementById('profileName').value,
+                    phone: document.getElementById('profilePhone').value,
+                    email: document.getElementById('profileEmail').value,
+                    date_of_birth: document.getElementById('profileDateOfBirth').value,
+                    aadhaar_last_4: document.getElementById('profileAadhaarLast4').value,
+                    doctor_type: document.getElementById('profileDoctorType').value,
+                    license_number: document.getElementById('profileLicenseNumber').value,
+                    department: document.getElementById('profileDepartment').value,
+                    specialization: document.getElementById('profileSpecialization').value,
+                    qualification: document.getElementById('profileQualification').value,
+                    experience: document.getElementById('profileExperience').value,
+                    hospital: document.getElementById('profileHospital').value,
+                    clinic_address: document.getElementById('profileAddress').value
+                    })
+                });
+                const result = await response.json();
+                document.getElementById('profileStatus').textContent = response.ok
+                    ? 'Details updated successfully.'
+                    : (result.message || 'Could not update details. The phone number may already belong to another account.');
+            } catch (error) {
+                document.getElementById('profileStatus').textContent = 'Cannot connect to the Python backend.';
+            }
+        });
+
+        document.getElementById('twoStepToggle').addEventListener('change', async event => {
+            if (event.target.checked) {
+                document.getElementById('securityStatus').textContent = 'Password verification enabled after PIN.';
+            }
+            const response = await fetch(`${API.baseUrl}/security`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', role: accountRole, identifier: accountIdentifier, enabled: event.target.checked })
+            });
+            document.getElementById('securityStatus').textContent = response.ok
+                ? 'Two-step verification setting saved.' : 'Could not save security setting.';
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            if (newPassword !== document.getElementById('confirmNewPassword').value) {
+                document.getElementById('passwordStatus').textContent = 'New passwords do not match.';
+                return;
+            }
+            const response = await fetch(`${API.baseUrl}/account-password`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    role: accountRole, identifier: accountIdentifier,
+                    current_password: document.getElementById('currentPassword').value,
+                    new_password: newPassword
+                })
+            });
+            const result = await response.json();
+            document.getElementById('passwordStatus').textContent = result.message;
+            if (response.ok) document.getElementById('passwordForm').reset();
+        });
+
+        document.getElementById('savePopupPin').addEventListener('click', async () => {
+            const pin = document.getElementById('passwordPopupPin').value;
+            const confirmation = document.getElementById('passwordPopupPinConfirm').value;
+            if (!/^\d{4}$/.test(pin) || pin !== confirmation) {
+                document.getElementById('passwordStatus').textContent = 'Enter matching 4-digit PINs.';
+                return;
+            }
+            const response = await fetch(`${API.baseUrl}/security/set-pin`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: accountRole, identifier: accountIdentifier, pin })
+            });
+            const result = await response.json();
+            document.getElementById('passwordStatus').textContent = result.message;
+            if (response.ok) {
+                document.getElementById('passwordPopupPin').value = '';
+                document.getElementById('passwordPopupPinConfirm').value = '';
+                document.getElementById('twoStepToggle').checked = true;
+            }
+        });
+
+        loadAccountSettings();
+
+        const doctorIdentifier = sessionStorage.getItem('samanIdentifier') || '';
+        const notificationButton = document.querySelector('.notification-button');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const notificationList = document.getElementById('notificationList');
+        const notificationCount = document.getElementById('notificationCount');
+
+        async function loadNotifications() {
+            if (!doctorIdentifier) return;
+            const response = await fetch(`${API.baseUrl}/notifications`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient_id: doctorIdentifier })
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            notificationCount.textContent = data.unread;
+            notificationCount.hidden = !data.unread;
+            notificationList.innerHTML = data.notifications.length
+                ? data.notifications.map(item => `<p class="notification-item">${item.message}<small>${new Date(item.created_at).toLocaleString()}</small></p>`).join('')
+                : '<p>No notifications yet.</p>';
+        }
+
+        notificationButton.addEventListener('click', () => {
+            notificationPanel.hidden = !notificationPanel.hidden;
+            if (!notificationPanel.hidden) loadNotifications();
+        });
+        document.getElementById('markNotificationsRead').addEventListener('click', async () => {
+            await fetch(`${API.baseUrl}/notifications`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mark_read', recipient_id: doctorIdentifier }) });
+            loadNotifications();
+        });
+        loadNotifications();
+
+        function openPatientDetail(patientId) {
+            const modal = document.getElementById('patientDetailModal');
+            document.getElementById('patientName').textContent = patientId === 'P100245' ? 'Sanath Deo' : 'Patient Name';
+            document.getElementById('patientID').textContent = patientId;
+            modal.hidden = false;
+        }
+
+        function closePatientDetail() {
+            document.getElementById('patientDetailModal').hidden = true;
+        }
+
+        document.getElementById('visitStatus').addEventListener('change', async event => {
+            const patientId = document.getElementById('patientInfoId').textContent.trim();
+            const response = await fetch(`${API.baseUrl}/appointments`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_status',
+                    patient_id: patientId,
+                    doctor_id: accountIdentifier,
+                    status: event.target.value
+                })
+            });
+            const result = await response.json();
+            document.getElementById('visitStatusMessage').textContent = response.ok
+                ? `Visit status updated to ${result.appointment.status}.` : result.message;
+        });
+
+        let patientRecords = [];
+        let patientIndex = 0;
+
+        function fillPatientInfo(patient) {
+            document.getElementById('patientInfoId').textContent = patient.id || '-';
+            document.getElementById('patientInfoName').value = patient.name || '';
+            document.getElementById('patientInfoAge').value = patient.age || '';
+            document.getElementById('patientInfoGender').value = patient.gender || '';
+            document.getElementById('patientInfoPhone').value = patient.phone || '';
+            document.getElementById('patientInfoEmail').value = patient.email || '';
+            document.getElementById('patientInfoAddress').value = patient.address || '';
+            document.getElementById('patientInfoHistory').value = patient.medical_history || '';
+        }
+
+        async function loadPatientRecords() {
+            patientRecords = await API.getPatients();
+            const currentId = document.getElementById('patientInfoId').textContent.trim();
+            patientIndex = Math.max(0, patientRecords.findIndex(patient => patient.id === currentId));
+            if (patientRecords.length) fillPatientInfo(patientRecords[patientIndex]);
+        }
+
+        document.getElementById('savePatientInfo').addEventListener('click', async () => {
+            const patientId = document.getElementById('patientInfoId').textContent.trim();
+            const response = await fetch(`${API.baseUrl}/patients`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update', patient_id: patientId,
+                    name: document.getElementById('patientInfoName').value,
+                    age: document.getElementById('patientInfoAge').value,
+                    gender: document.getElementById('patientInfoGender').value,
+                    phone: document.getElementById('patientInfoPhone').value,
+                    email: document.getElementById('patientInfoEmail').value,
+                    address: document.getElementById('patientInfoAddress').value,
+                    medical_history: document.getElementById('patientInfoHistory').value
+                })
+            });
+            document.getElementById('patientInfoMessage').textContent = response.ok
+                ? 'Patient updates saved.' : 'Could not save patient updates.';
+            if (response.ok) await loadPatientRecords();
+        });
+
+        document.getElementById('nextPatient').addEventListener('click', () => {
+            if (!patientRecords.length) return;
+            patientIndex = (patientIndex + 1) % patientRecords.length;
+            fillPatientInfo(patientRecords[patientIndex]);
+            document.getElementById('patientInfoMessage').textContent = `Showing patient ${patientIndex + 1} of ${patientRecords.length}.`;
+        });
+
+        loadPatientRecords();
+
+        function openNewPrescription() {
+            const patientId = prompt('Patient ID');
+            const medicineName = patientId && prompt('Medicine name');
+            const dosage = medicineName && prompt('Dosage, for example 500mg');
+            const frequency = dosage && prompt('Frequency, for example twice daily');
+            const duration = frequency && prompt('Duration, for example 7 days');
+            if (!patientId || !medicineName || !dosage || !frequency || !duration) return;
+            API.addPrescription({
+                doctor_id: sessionStorage.getItem('samanIdentifier') || '',
+                patient_id: patientId, medicine_name: medicineName, dosage, frequency, duration
+            }).then(success => alert(success ? 'Prescription saved to the patient dashboard.' : 'Prescription could not be saved.'));
+        }
+
+        function openNewReport() {
+            const patientId = prompt('Patient ID');
+            const reportType = patientId && prompt('Report type');
+            const reportData = reportType && prompt('Report result or notes');
+            if (!patientId || !reportType || !reportData) return;
+            API.addLabReport({ patient_id: patientId, report_type: reportType, report_data: reportData })
+                .then(success => alert(success ? 'Lab report saved to the patient dashboard.' : 'Lab report could not be saved.'));
+        }
+
+        function openBookAppointment() {
+            const patientId = prompt('Patient ID');
+            const appointmentDate = patientId && prompt('Appointment date (YYYY-MM-DD)');
+            const appointmentTime = appointmentDate && prompt('Appointment time');
+            const notes = appointmentTime && prompt('Appointment notes');
+            if (!patientId || !appointmentDate || !appointmentTime) return;
+            API.addAppointment({
+                doctor_id: sessionStorage.getItem('samanIdentifier') || '',
+                patient_id: patientId, appointment_date: appointmentDate,
+                appointment_time: appointmentTime, status: 'scheduled', notes: notes || ''
+            }).then(success => alert(success ? 'Appointment saved to the patient dashboard.' : 'Appointment could not be saved.'));
+        }
+
+        function openReferral() {
+            const patientId = prompt('Patient ID');
+            const referredTo = patientId && prompt('Refer to doctor or department');
+            const reason = referredTo && prompt('Referral reason');
+            if (!patientId || !referredTo || !reason) return;
+            API.addReferral({
+                doctor_id: sessionStorage.getItem('samanIdentifier') || '',
+                patient_id: patientId, referred_to: referredTo, reason
+            }).then(success => alert(success ? 'Referral saved to the patient dashboard.' : 'Referral could not be saved.'));
+        }
+
+        function openPendingReports() {
+            alert('Open pending reports - Integration with backend required');
+        }
+
+        // Close modal on background click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('patientDetailModal');
+            if (e.target === modal) {
+                closePatientDetail();
+            }
+        });
+    </script>
+</body>
+</html>

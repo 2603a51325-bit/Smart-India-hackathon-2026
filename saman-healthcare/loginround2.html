@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saman Healthcare | Login</title>
+    <!-- All visual styling is kept in this separate CSS file. -->
+    <link rel="stylesheet" href="loginround2.css">
+    <script src="api.js"></script>
+</head>
+
+<body>
+    <!-- The main container holds the welcome section and the form section. -->
+    <main class="auth-shell">
+        <!-- Left side: branding, introduction, and healthcare illustration. -->
+        <section class="welcome-panel" aria-label="Saman Healthcare">
+            <div class="brand"><span class="brand-mark" aria-hidden="true">+</span> <span class="brand-text">Saman
+                    Healthcare</span></div>
+            <div class="welcome-copy">
+                <h1>Care begins with a conversation.</h1>
+                <p>Connect with your care team, manage appointments, and keep your health journey in one place.</p>
+            </div>
+            <svg class="medical-illustration" viewBox="0 0 520 330" role="img"
+                aria-label="Healthcare team illustration">
+                <circle cx="260" cy="160" r="140" fill="rgba(88,145,255,.28)" />
+                <path d="M119 285h275M151 80v160m78-160v160m78-160v160m-162-128h162m-162 55h162"
+                    stroke="rgba(116,181,255,.42)" stroke-width="8" />
+                <path d="M55 274c28-26 54-25 79 0" stroke="#56e1d0" stroke-width="6" fill="none" />
+                <path d="M72 274c-15-23-24-38-24-58 23 9 38 29 24 58Zm28 0c3-27 13-44 31-56 9 24-1 46-31 56Z"
+                    fill="#53e0d0" />
+                <path d="M61 278h45v20H61z" fill="#2234a7" />
+                <g transform="translate(156 78)">
+                    <circle cx="65" cy="32" r="28" fill="#d98676" />
+                    <path d="M38 36c-2-34 49-49 63-8-17-12-42-10-63 8Z" fill="#24225c" />
+                    <path d="M35 75c20-18 47-18 65 0l17 115H18Z" fill="#39dbc9" />
+                    <path d="M48 76l20 45 20-45M68 120v70" fill="none" stroke="#fff" stroke-width="5" />
+                    <path d="M45 190l-8 65m43-65 10 65" stroke="#37e0c6" stroke-width="17" />
+                    <path d="M31 258h28m25 0h29" stroke="#f6f8ff" stroke-width="10" stroke-linecap="round" />
+                </g>
+                <g transform="translate(302 71)">
+                    <circle cx="64" cy="35" r="28" fill="#ad625f" />
+                    <path d="M38 37c-4-35 56-48 63-3-20-15-42-15-63 3Z" fill="#4a2857" />
+                    <path d="M25 78c24-21 55-21 80 0l-2 116H28Z" fill="#f5f7ff" />
+                    <path d="M65 78v116m-39-92h78" stroke="#b8c9ef" stroke-width="4" />
+                    <path d="M48 194l-10 61m43-61 12 61" stroke="#43d6c4" stroke-width="18" />
+                    <path d="M32 258h31m23 0h31" stroke="#f6f8ff" stroke-width="10" stroke-linecap="round" />
+                </g>
+            </svg>
+        </section>
+        <!-- Right side: the login form. -->
+        <section class="form-panel">
+            <div class="auth-card" id="authCard">
+                <h2>Welcome back!</h2>
+                <form id="authForm">
+                    <!-- Choose which type of healthcare account is being accessed. -->
+                    <div class="role-switch" role="group" aria-label="Account type">
+                        <button class="active" id="patientRole" type="button" data-role="patient"
+                            aria-pressed="true">Patient</button>
+                        <button id="doctorRole" type="button" data-role="doctor" aria-pressed="false">Doctor</button>
+                    </div>
+                    <div class="field"><label id="userIdLabel" for="userId"><button class="identifier-link active"
+                                id="patientIdOption" type="button">Patient ID</button> or <button
+                                class="identifier-link" id="phoneOption" type="button">phone
+                                number</button></label><input id="userId" type="text" inputmode="text"
+                            placeholder="patient ID" autocomplete="username" required></div>
+                            <div class="field"><label for="password">Security PIN</label><input id="password" type="password"
+                                inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="4-digit security PIN"
+                                autocomplete="one-time-code" required></div>
+                    <div class="login-only">
+                        <div class="form-row"><label class="remember"><input type="checkbox"> Remember me</label><a href="forgotpass.html">Forgot password?</a></div>
+                    </div>
+                    <button class="primary-button" id="submitButton" type="submit">Log in securely</button>
+                </form>
+                <p class="switch-copy"><a href="registration.html">Create an account</a></p>
+                <p class="status" id="status" role="status"></p>
+            </div>
+        </section>
+    </main>
+    <div class="otp-overlay" id="otpOverlay" hidden>
+        <section class="otp-modal" role="dialog" aria-modal="true" aria-labelledby="otpTitle">
+            <button class="otp-close" id="otpClose" type="button"
+                aria-label="Close verification window">&times;</button>
+            <div class="whatsapp-badge" aria-hidden="true">PASSWORD</div>
+            <h2 id="otpTitle">Complete two-step verification</h2>
+            <p class="otp-message">Your PIN is verified. Enter your account password to continue.</p>
+            <form id="otpForm">
+                <label class="otp-label" for="otpCode">Account password</label>
+                <input class="otp-input" id="otpCode" type="password" autocomplete="current-password"
+                    placeholder="Password" required>
+                <button class="primary-button" type="submit">Verify and continue</button>
+            </form>
+            <p class="otp-status" id="otpStatus" role="status"></p>
+        </section>
+    </div>
+
+    <div class="otp-overlay" id="humanVerificationOverlay" hidden>
+        <section class="otp-modal" role="dialog" aria-modal="true" aria-labelledby="humanVerificationTitle">
+            <button class="otp-close" id="humanVerificationClose" type="button"
+                aria-label="Close human verification">&times;</button>
+            <div class="whatsapp-badge" aria-hidden="true">VERIFY</div>
+            <h2 id="humanVerificationTitle">Human verification required</h2>
+            <p class="otp-message">Two failed login attempts were detected. Hold the button below for 2 seconds to confirm you are a real user.</p>
+            <button class="human-verify-button" id="humanVerifyButton" type="button">Hold to verify</button>
+            <p class="otp-status" id="humanVerificationStatus" role="status"></p>
+        </section>
+    </div>
+    <script>
+        // Animate the page before moving to the registration screen.
+        document.querySelectorAll('a[href="registration.html"]').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                document.body.classList.add('page-exit');
+                window.setTimeout(() => { window.location.href = link.href; }, 260);
+            });
+        });
+
+        // Get references to the page elements that JavaScript needs to control.
+        const card = document.getElementById('authCard'), form = document.getElementById('authForm'), status = document.getElementById('status'), userId = document.getElementById('userId'), userIdLabel = document.getElementById('userIdLabel'), patientIdOption = document.getElementById('patientIdOption'), phoneOption = document.getElementById('phoneOption'), patientRole = document.getElementById('patientRole'), doctorRole = document.getElementById('doctorRole'), otpOverlay = document.getElementById('otpOverlay'), otpClose = document.getElementById('otpClose'), otpForm = document.getElementById('otpForm'), otpCode = document.getElementById('otpCode'), otpStatus = document.getElementById('otpStatus');
+        const humanVerificationOverlay = document.getElementById('humanVerificationOverlay');
+        const humanVerificationClose = document.getElementById('humanVerificationClose');
+        const humanVerifyButton = document.getElementById('humanVerifyButton');
+        const humanVerificationStatus = document.getElementById('humanVerificationStatus');
+        const backendBase = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+        let failedLoginAttempts = 0;
+        let humanVerificationHoldTimer = null;
+
+        function resetLoginAttempts() {
+            failedLoginAttempts = 0;
+            status.classList.remove('success');
+        }
+
+        function showHumanVerification() {
+            humanVerificationStatus.textContent = 'Hold the button to continue.';
+            humanVerificationOverlay.hidden = false;
+            humanVerifyButton.disabled = false;
+            humanVerifyButton.textContent = 'Hold to verify';
+            clearTimeout(humanVerificationHoldTimer);
+            humanVerificationHoldTimer = null;
+        }
+
+        function hideHumanVerification() {
+            humanVerificationOverlay.hidden = true;
+            humanVerificationStatus.textContent = '';
+            clearTimeout(humanVerificationHoldTimer);
+            humanVerificationHoldTimer = null;
+            humanVerifyButton.textContent = 'Hold to verify';
+        }
+
+        humanVerificationClose.addEventListener('click', () => {
+            hideHumanVerification();
+            status.textContent = 'Verification cancelled. Please try again after re-entering your credentials.';
+        });
+
+        humanVerificationOverlay.addEventListener('click', event => {
+            if (event.target === humanVerificationOverlay) {
+                humanVerificationClose.click();
+            }
+        });
+
+        function startHumanVerificationHold() {
+            if (humanVerificationHoldTimer) return;
+            humanVerifyButton.textContent = 'Holding...';
+            humanVerificationStatus.textContent = 'Keep holding...';
+            humanVerificationHoldTimer = setTimeout(async () => {
+                const role = doctorRole.classList.contains('active') ? 'doctor' : 'patient';
+                try {
+                    const response = await fetch(`${backendBase}/api/human-verify`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ role, identifier: userId.value })
+                    });
+                    const result = await response.json();
+                    hideHumanVerification();
+                    status.textContent = result.message || 'Account verified. You may try logging in again.';
+                    status.classList.toggle('success', response.ok);
+                    failedLoginAttempts = 0;
+                    humanVerifyButton.textContent = 'Hold to verify';
+                } catch (error) {
+                    hideHumanVerification();
+                    status.textContent = 'Verification request failed. Please try again.';
+                    status.classList.remove('success');
+                }
+            }, 2000);
+        }
+
+        function cancelHumanVerificationHold() {
+            if (!humanVerificationHoldTimer) return;
+            clearTimeout(humanVerificationHoldTimer);
+            humanVerificationHoldTimer = null;
+            humanVerifyButton.textContent = 'Hold to verify';
+            humanVerificationStatus.textContent = 'Hold the button to continue.';
+        }
+
+        humanVerifyButton.addEventListener('pointerdown', startHumanVerificationHold);
+        humanVerifyButton.addEventListener('pointerup', cancelHumanVerificationHold);
+        humanVerifyButton.addEventListener('pointerleave', cancelHumanVerificationHold);
+        humanVerifyButton.addEventListener('pointercancel', cancelHumanVerificationHold);
+
+        // Highlight the selected role while keeping phone login available for both account types.
+        function setRole(role) {
+            const isDoctor = role === 'doctor';
+            card.classList.toggle('doctor-mode', isDoctor);
+            patientRole.classList.toggle('active', !isDoctor);
+            doctorRole.classList.toggle('active', isDoctor);
+            patientRole.setAttribute('aria-pressed', String(!isDoctor));
+            doctorRole.setAttribute('aria-pressed', String(isDoctor));
+            setIdentifier(phoneOption.classList.contains('active') ? 'phone' : 'id');
+        }
+
+        patientRole.addEventListener('click', () => setRole('patient'));
+        doctorRole.addEventListener('click', () => setRole('doctor'));
+
+        function setIdentifier(identifier) {
+            const usePhone = identifier === 'phone';
+            const accountType = card.classList.contains('doctor-mode') ? 'doctor' : 'patient';
+            patientIdOption.classList.toggle('active', !usePhone);
+            phoneOption.classList.toggle('active', usePhone);
+            userId.type = usePhone ? 'tel' : 'text';
+            userId.inputMode = usePhone ? 'tel' : 'text';
+            userId.autocomplete = usePhone ? 'tel' : 'username';
+            userId.placeholder = usePhone ? 'Phone number' : `${accountType} ID`;
+        }
+
+        patientIdOption.addEventListener('click', () => setIdentifier('id'));
+        phoneOption.addEventListener('click', () => setIdentifier('phone'));
+        userId.addEventListener('input', () => {
+            // Switch to phone mode automatically when the identifier contains only phone characters.
+            if (/^\+?[\d\s().-]{7,}$/.test(userId.value.trim())) setIdentifier('phone');
+        });
+        setIdentifier('id');
+
+        function openDashboard(role, identifier) {
+            sessionStorage.setItem('samanRole', role);
+            sessionStorage.setItem('samanIdentifier', identifier);
+            const dashboard = role === 'doctor'
+                ? 'doctor-details-dashboard.html'
+                : 'doctor-dashround2.html';
+            status.textContent = 'Login successful. Opening your dashboard...';
+            window.setTimeout(() => { window.location.href = dashboard; }, 500);
+        }
+
+        // Send the login form to the Python backend without reloading the page.
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            status.textContent = 'Checking your login details...';
+
+            // Read the selected account type and the values entered by the user.
+            const role = doctorRole.classList.contains('active') ? 'doctor' : 'patient';
+
+            const loginRequest = {
+                role,
+                identifier: userId.value,
+                password: document.getElementById('password').value,
+                two_step: false
+            };
+
+            try {
+                // Send the login request to the local Python API as JSON.
+                const response = await fetch(`${backendBase}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginRequest)
+                });
+
+                // Read the backend message and show it below the form.
+                const result = await response.json();
+                if (response.ok && result.requires_password) {
+                    resetLoginAttempts();
+                    // Open the password popup after the PIN has been verified.
+                    status.textContent = result.message;
+                    otpStatus.textContent = '';
+                    otpCode.value = '';
+                    otpOverlay.hidden = false;
+                    otpCode.focus();
+                } else if (!response.ok) {
+                    failedLoginAttempts += 1;
+                    status.textContent = result.message || 'The security PIN is not correct.';
+                    if (failedLoginAttempts >= 2) {
+                        status.textContent = 'Too many failed attempts. Human verification is required.';
+                        showHumanVerification();
+                    }
+                } else {
+                    resetLoginAttempts();
+                    // Complete direct login when two-step verification is disabled.
+                    status.textContent = result.message;
+                    status.classList.toggle('success', response.ok);
+                    if (response.ok) openDashboard(result.role || role, userId.value);
+                }
+            } catch (error) {
+                // Tell the user when the Python server is not running.
+                status.textContent = 'Cannot connect to the Python backend.';
+                status.classList.remove('success');
+            }
+        });
+
+        // Close the popup without completing the pending login.
+        otpClose.addEventListener('click', () => {
+            otpOverlay.hidden = true;
+            otpCode.value = '';
+        });
+
+        // Allow the user to dismiss the popup by clicking its backdrop.
+        otpOverlay.addEventListener('click', event => {
+            if (event.target === otpOverlay) otpClose.click();
+        });
+
+        // Send the entered password to Python after the PIN was accepted.
+        otpForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            otpStatus.textContent = 'Checking the password...';
+
+            try {
+                // Verify the password with the backend.
+                const response = await fetch(`${backendBase}/api/verify-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: doctorRole.classList.contains('active') ? 'doctor' : 'patient', identifier: userId.value, password: otpCode.value })
+                });
+                const result = await response.json();
+                otpStatus.textContent = result.message;
+
+                if (response.ok) {
+                    resetLoginAttempts();
+                    status.textContent = result.message;
+                    status.classList.add('success');
+                    otpOverlay.hidden = true;
+                    openDashboard(result.role || (doctorRole.classList.contains('active') ? 'doctor' : 'patient'), userId.value);
+                } else {
+                    failedLoginAttempts += 1;
+                    if (failedLoginAttempts >= 2) {
+                        otpStatus.textContent = 'Too many failed password checks. Human verification is required.';
+                        otpOverlay.hidden = true;
+                        showHumanVerification();
+                    }
+                }
+            } catch (error) {
+                // Explain when the verification request cannot reach Python.
+                otpStatus.textContent = 'Cannot connect to the Python backend.';
+            }
+        });
+    </script>
+</body>
+
+</html>
